@@ -37,6 +37,20 @@ sudo certbot renew --dry-run
 
 ## 后续更新
 
+### Google Search Console 验证文件
+
+用户提供的 `googlecffa0146307cc419.html` 原文件保存在 `public/googlecffa0146307cc419.html`，Astro 构建时会原样复制到网站根目录并包含在部署包中。Google 的验证地址为 `http://robotdogcxy.xyz/googlecffa0146307cc419.html`。验证成功后也应保留该文件，后续更新不要删除。
+
+如果网站已经运行且只需补上此文件，在 Ubuntu 终端执行：
+
+```bash
+curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/public/googlecffa0146307cc419.html -o /tmp/googlecffa0146307cc419.html && sudo install -m 644 /tmp/googlecffa0146307cc419.html /var/www/robotdogcxy/current/googlecffa0146307cc419.html
+```
+
+打开验证地址，确认返回 `google-site-verification: googlecffa0146307cc419.html`，再回到 Search Console 点击“验证”。这条命令需在实际服务器执行；提交到 GitHub 不会自动更新已部署的网站。
+
+### 构建并部署更新
+
 在开发电脑或 Codex 环境更新源码后运行：
 
 ```bash
