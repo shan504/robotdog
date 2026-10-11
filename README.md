@@ -10,6 +10,19 @@
 
 需要 Node.js 22.12+ 和 npm，本环境使用 Node.js 24.19.0。
 
+Windows 用户在 PowerShell 中运行：
+
+```powershell
+cd "$env:USERPROFILE\robotdog"
+git pull --ff-only
+npm ci --cache "$env:LOCALAPPDATA\npm-cache"
+npm run dev -- --port 4321
+```
+
+启动后在浏览器打开 `http://localhost:4321/`。用户目录缓存可以避开旧 Node.js 安装目录的写入权限错误。`dev`、`build`、`preview` 通过 Node.js 设置环境变量，兼容 Windows PowerShell 与 Linux/macOS，不依赖 Unix shell 的变量赋值语法。
+
+Linux/macOS 或云环境中运行：
+
 ```bash
 cd /workspace/robotdog
 npm ci
