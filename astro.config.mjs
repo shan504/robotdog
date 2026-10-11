@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://www.robotdog.com',
+  site: 'https://robotdogcxy.xyz',
   output: 'static',
   trailingSlash: 'always',
   devToolbar: { enabled: false },

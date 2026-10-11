@@ -384,10 +384,10 @@ test('all public pages have distinct SEO metadata, correct sitemap coverage, wor
   expect(sitemap.status()).toBe(200);
   const urls = [...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
   expect(new Set(urls).size).toBe(urls.length);
-  expect(new Set(urls)).toEqual(new Set(publicPaths.map(path => `https://www.robotdog.com${path}`)));
+  expect(new Set(urls)).toEqual(new Set(publicPaths.map(path => `https://robotdogcxy.xyz${path}`)));
   expect(urls.some(url => /\/(orders|checkout|payment)\//.test(url))).toBe(false);
   const robots = await request.get('/robots.txt');
-  expect(await robots.text()).toContain('Sitemap: https://www.robotdog.com/sitemap.xml');
+  expect(await robots.text()).toContain('Sitemap: https://robotdogcxy.xyz/sitemap.xml');
   const titles = new Set<string>();
   const descriptions = new Set<string>();
   const resources = new Map<string, boolean>();
@@ -401,7 +401,7 @@ test('all public pages have distinct SEO metadata, correct sitemap coverage, wor
     expect(description.length, `${path} needs a useful description`).toBeGreaterThan(20);
     expect(descriptions.has(description), `Duplicate description on ${path}`).toBe(false);
     descriptions.add(description);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://www.robotdog.com${path}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://robotdogcxy.xyz${path}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
     const content = await page.evaluate(() => ({

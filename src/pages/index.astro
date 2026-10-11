@@ -5,7 +5,7 @@ import ProductCard from '../components/ProductCard.astro';
 import { products } from '../data/catalog';
 import { articles } from '../data/articles';
 const featured = ['go2-air','as2-air','b2-standard','go2w-standard'].map(slug=>products.find(p=>p.slug===slug)).filter(Boolean);
-const schema = { '@context':'https://schema.org','@type':'Organization',name:'RobotDog',url:'https://www.robotdog.com',logo:'https://www.robotdog.com/favicon.svg' };
+const schema = { '@context':'https://schema.org','@type':'Organization',name:'RobotDog',url:'https://robotdogcxy.xyz',logo:'https://robotdogcxy.xyz/favicon.svg' };
 const categories = [{name:'消费与科研',en:'EVERYDAY INTELLIGENCE',description:'让好奇成为日常，让想法走出实验室。',href:'/products/?family=go2',image:'/images/catalog/go2.jpg'},{name:'行业与巡检',en:'BUILT FOR THE REAL WORLD',description:'从复杂地形到真实任务，为现场寻找新解法。',href:'/products/?family=b2',image:'/images/catalog/b2.jpg'},{name:'配件与拓展',en:'EXPAND YOUR POSSIBILITIES',description:'从感知到计算，把机器人的能力向外延伸。',href:'/products/#accessories',image:'/images/catalog/lidar.webp'}];
 ---
 <Layout darkHeader schema={schema}>

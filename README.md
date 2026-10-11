@@ -1,6 +1,6 @@
 # RobotDog 机器狗商城
 
-面向 `https://www.robotdog.com` 的中文商城效果预览，使用 Astro 静态输出。白色产品目录、黑色技术详情与蓝色交互，支持手机浏览。
+面向 `https://robotdogcxy.xyz` 的中文商城效果预览，使用 Astro 静态输出。白色产品目录、黑色技术详情与蓝色交互，支持手机浏览。
 
 源码与后续更新统一保存在 [shan504/robotdog](https://github.com/shan504/robotdog)。[下载完整网站预览压缩包](https://github.com/shan504/robotdog/raw/refs/heads/main/RobotDog-v2-preview.zip)，解压后用桌面浏览器打开其中的 HTML。仓库中的 `src/` 和 `public/` 是可直接修改的网站源码与素材；压缩包用于查看效果。
 
@@ -78,4 +78,4 @@ npm run export:preview
 
 所有公开页面在构建时生成 HTML，包含独立标题、描述、canonical、图片说明和站内链接。站点地图自动收录全部商品、应用方案及文章；购物车、结算、支付页面设置 noindex 并从 sitemap 排除。商品价格为演示内容，因此没有发布可误认为真实报价的 Offer 结构化数据。
 
-域名和阿里云服务器尚未上线，部署步骤与 Nginx 模板见 [deploy/ALIYUN.md](deploy/ALIYUN.md)。静态展示可直接部署；实际收款需要后端与真实商户渠道。
+部署目标为用户提供的 `robotdogcxy.xyz` 和阿里云 Ubuntu 22.04 服务器（公网 IP `47.85.33.165`）。运行 `npm run package:deploy` 生成生产网站包，服务器执行 `deploy/ubuntu-deploy.sh` 安装到 Nginx；具体命令与 HTTPS 步骤见 [deploy/ALIYUN.md](deploy/ALIYUN.md)。服务器无需 Node.js。仓库构建成功不代表服务器已部署，公开访问需按文档在实际服务器验证；实际收款需要后端与真实商户渠道。

@@ -5,7 +5,7 @@ import { solutions } from '../data/solutions';
 
 export const prerender = true;
 
-const origin = 'https://www.robotdog.com';
+const origin = 'https://robotdogcxy.xyz';
 const pages = [
   '/',
   '/products/',

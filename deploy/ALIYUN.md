@@ -1,53 +1,71 @@
-# 阿里云部署参考
+# Ubuntu / 阿里云部署
 
-网站目前是效果预览，还未购买服务器、修改 DNS 或部署到公网。
+目标域名：`robotdogcxy.xyz`。用户提供的服务器为 Ubuntu 22.04、2 核 CPU、1 GB 内存，公网 IPv4 为 `47.85.33.165`。网站是 Astro 静态输出，服务器运行 Nginx，无需安装 Node.js 或数据库。
 
-## 配置建议
+## 首次部署
 
-初期可选阿里云 ECS 或轻量应用服务器：2 核 CPU、2 GB 内存、Ubuntu 24.04、40 GB 磁盘。静态网站无需数据库或常驻 Node.js 服务；访问量增长时可增加带宽并接入 CDN。规格和费用以阿里云控制台当前选项为准。
-
-若选中国大陆节点，域名需要完成相应的 ICP 备案后对外提供网站服务；备案主体和页脚展示信息需使用实际资料。其他地域的要求和访问表现应结合目标用户选择。
-
-## 上传构建结果
-
-在开发电脑或本云环境构建：
-
-```bash
-npm ci
-npm run build
-tar -czf robotdog-site.tar.gz -C dist .
-```
-
-把 `robotdog-site.tar.gz` 与 `deploy/nginx-http.conf` 上传到服务器。以下步骤在你购买并登录的 Ubuntu 服务器执行（不是当前预览容器）：
+在阿里云 Workbench 的 Ubuntu 终端执行，每条命令成功后再执行下一条：
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y nginx
-sudo mkdir -p /var/www/robotdog
-sudo tar -xzf robotdog-site.tar.gz -C /var/www/robotdog
-sudo cp nginx-http.conf /etc/nginx/sites-available/robotdog
-sudo ln -s /etc/nginx/sites-available/robotdog /etc/nginx/sites-enabled/robotdog
-sudo nginx -t
-sudo systemctl reload nginx
+sudo apt-get install -y nginx curl ca-certificates
+curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/deploy/ubuntu-deploy.sh -o robotdog-deploy.sh
+sudo bash robotdog-deploy.sh
 ```
 
-如果站点配置或目录已经存在，先检查原有内容；不要覆盖其他站点或用户文件。后续更新时，先将新版解压到新目录并检查，再切换部署目录，避免删除服务器上的其他文件。
+脚本从本仓库下载预构建网站包和 SHA-256 校验文件，通过校验后安装到 `/var/www/robotdogcxy/releases/`，再切换 `current` 链接。Nginx 检查通过后才重载，并请求本机首页确认内容。部署失败会恢复本次修改的入口；旧版本目录保留。首次部署创建 `/etc/nginx/sites-available/robotdogcxy`，后续更新保留 Certbot 增加的 HTTPS 配置。
 
-## 域名与 HTTPS
+脚本不会删除其他站点或覆盖非本项目配置。若该域名已在其他 Nginx 配置中使用，脚本会显示冲突文件并停止；先检查现有配置，再决定如何调整。不要直接删除其他网站配置。
 
-1. 在域名 DNS 控制台将 `www` 与 `@` 的 A 记录指向服务器公网 IPv4。确认你拥有 `robotdog.com` 的管理权限。
-2. 在安全组开放网站 80/443；SSH 22 仅允许你使用的管理 IP。
-3. 先通过 HTTP 验证站点、产品详情、文章与 404。
-4. 申请并安装覆盖 `robotdog.com` 和 `www.robotdog.com` 的有效 TLS 证书。把证书链和私钥分别放到 `nginx-https.conf` 指定路径；私钥只保存在服务器，限制读取权限。
-5. 使用 HTTPS 配置替换该站点的 HTTP 配置，执行 `sudo nginx -t`，成功后重载 Nginx。
-6. 确认 HTTP 和裸域名均 301 跳转到 `https://www.robotdog.com`，内容页、图片与站点地图正常。
+阿里云轻量服务器防火墙需要放行 TCP 80 和 443。域名解析的 `@` A 记录应指向 `47.85.33.165`。若 Ubuntu 已启用 UFW，再运行 `sudo ufw allow 'Nginx Full'`；不要为部署启用或重置 UFW。
 
-## 上线检查
+部署成功后用浏览器访问 `http://robotdogcxy.xyz/`。本机请求通过不能证明公网 DNS 与防火墙已生效，仍需外部浏览器确认。
 
-- 确认 34 个商品 SKU 的真实售价、规格、库存与配置关系，以及厂商模型渲染和生成图片的销售展示适用性；补全销售主体、联系方式、售后与备案信息。
-- 接入真实询价服务，并同步更新隐私说明。
-- 购物与支付当前是浏览器演示。实际收款需新增服务端订单、价格校验、商户签名、支付回调与订单持久存储，并使用正式微信 / 支付宝商户渠道；静态页面不能自行完成这些功能。
-- 验证移动页面、询价实际送达、产品和文章内容、HTTPS、重定向、404 和 sitemap。
-- 在百度与 Google 的站长平台验证域名，提交 `https://www.robotdog.com/sitemap.xml`。
+## HTTPS
 
-`nginx-http.conf` / `nginx-https.conf` 为部署模板。本环境验证了静态构建和浏览器功能，未连接真实阿里云服务器验证部署。
+确认域名的 HTTP 网站可从公网访问后，在同一个 Ubuntu 终端执行：
+
+```bash
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d robotdogcxy.xyz --redirect
+sudo certbot renew --dry-run
+```
+
+按 Certbot 提示填写联系邮箱并阅读、确认服务条款。证书成功后访问 `https://robotdogcxy.xyz/`，HTTP 会重定向到 HTTPS。`www` 不是本次部署要求，不需要额外解析或证书。
+
+页面 canonical、结构化数据、分享图片 URL、robots 与站点地图统一使用 `https://robotdogcxy.xyz`；因此首次 HTTP 验证后应完成 HTTPS 步骤。
+
+## 后续更新
+
+在开发电脑或 Codex 环境更新源码后运行：
+
+```bash
+npm ci
+npm run package:deploy
+npm run export:preview
+```
+
+`package:deploy` 构建网站并生成：
+
+- `deploy/robotdog-site.tar.gz`：完整生产静态网站。
+- `deploy/robotdog-site.tar.gz.sha256`：校验文件。
+- `deploy/build-info.json`：域名、页面数和构建信息。
+
+将源码与以上三个文件一起提交到本仓库 `main`。Ubuntu 上重新下载并执行 `ubuntu-deploy.sh` 即可更新。不要在 1 GB 服务器上依赖开发服务器对外提供网站。
+
+## 检查与回滚
+
+```bash
+sudo nginx -t
+sudo systemctl status nginx --no-pager
+curl -I http://robotdogcxy.xyz/
+curl -I https://robotdogcxy.xyz/sitemap.xml
+readlink /var/www/robotdogcxy/current
+ls -1 /var/www/robotdogcxy/releases/
+```
+
+手动回滚时，先从 releases 中确认要恢复的版本目录；创建新的临时链接指向它，再用 `sudo mv -Tf` 切换 current，检查 Nginx 后重载。不要删除全部 releases，以便保留恢复路径。
+
+该站点目前是公开展示与购物流程演示：价格参数是展示样例，支付不会扣款。真实收款需要服务端订单、商户签名与回调。发布销售前补全实际销售资料及联系方式。
+
+本仓库的构建、浏览器与本地 Nginx 检查不等同于已登录阿里云或完成服务器部署；服务器执行结果和公网 HTTPS 需要在实际服务器确认。

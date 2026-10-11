@@ -295,8 +295,8 @@ export const scenarios: Scenario[] = [
 
 export const company = {
   name: 'RobotDog',
-  domain: 'robotdog.com',
-  url: 'https://www.robotdog.com',
+  domain: 'robotdogcxy.xyz',
+  url: 'https://robotdogcxy.xyz',
   tagline: '让智能走出想象，让未来迈向现实',
   description: 'RobotDog 是面向机器狗与四足机器人选型的产品展示与沟通平台。我们希望通过清晰的产品配置、直观的应用介绍和完整的选型路径，连接科技爱好者、教育团队、科研机构与行业项目，让复杂的机器人技术成为可以理解、比较与讨论的具体方案。',
   productNotice: '本网站为内部效果预览。所有价格为演示价，参数与配置为设计示例，购物车、订单及支付为演示流程。实际产品、官方规格、供货、授权关系、交付与服务需正式确认。',

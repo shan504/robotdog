@@ -5,18 +5,18 @@ import { articles, type Article } from '../../data/articles';
 export function getStaticPaths() { return articles.map((article) => ({ params: { slug: article.slug }, props: { article } })); }
 const { article } = Astro.props as { article: Article };
 const related = articles.filter((item) => item.slug !== article.slug).slice(0, 3);
-const articleUrl = `https://www.robotdog.com/journal/${article.slug}/`;
+const articleUrl = `https://robotdogcxy.xyz/journal/${article.slug}/`;
 const schema = [
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-    { '@type': 'ListItem', position: 1, name: '首页', item: 'https://www.robotdog.com/' },
-    { '@type': 'ListItem', position: 2, name: '探索与未来', item: 'https://www.robotdog.com/journal/' },
+    { '@type': 'ListItem', position: 1, name: '首页', item: 'https://robotdogcxy.xyz/' },
+    { '@type': 'ListItem', position: 2, name: '探索与未来', item: 'https://robotdogcxy.xyz/journal/' },
     { '@type': 'ListItem', position: 3, name: article.title, item: articleUrl },
   ] },
   { '@context': 'https://schema.org', '@type': 'Article', headline: article.title, description: article.seoDescription,
     datePublished: article.date, dateModified: article.date, inLanguage: 'zh-CN', mainEntityOfPage: articleUrl,
-    author: { '@type': 'Organization', name: 'RobotDog', url: 'https://www.robotdog.com/' },
-    publisher: { '@type': 'Organization', name: 'RobotDog', url: 'https://www.robotdog.com/' },
-    image: `https://www.robotdog.com${article.coverImage}`, articleSection: article.category,
+    author: { '@type': 'Organization', name: 'RobotDog', url: 'https://robotdogcxy.xyz/' },
+    publisher: { '@type': 'Organization', name: 'RobotDog', url: 'https://robotdogcxy.xyz/' },
+    image: `https://robotdogcxy.xyz${article.coverImage}`, articleSection: article.category,
   },
 ];
 ---
