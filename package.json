@@ -1,0 +1,20 @@
+{
+  "name": "robotdog-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev --host 0.0.0.0",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --host 0.0.0.0",
+    "test": "playwright test",
+    "export:preview": "node scripts/export-preview.mjs"
+  },
+  "dependencies": {
+    "astro": "7.3.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "esbuild": "0.28.2"
+  }
+}

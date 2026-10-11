@@ -1,0 +1,78 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { products } from '../../data/catalog';
+---
+<Layout title="订单支付演示｜RobotDog" description="体验 RobotDog 机器狗订单的微信与支付宝支付页面。本页为演示，不产生真实扣款。" noindex>
+  <section class="payment-page container">
+    <div class="breadcrumb"><a href="/products/">产品系列</a><span>/</span><a href="/orders/">购物车</a><span>/</span><a href="/checkout/">确认订单</a><span>/</span><span>支付演示</span></div>
+    <div class="payment-heading"><span class="eyebrow">ONE STEP CLOSER</span><h1>下一步，遇见未来。</h1><p>订单已准备好，请选择一种方式体验支付流程。</p></div>
+    <ol class="checkout-steps" aria-label="购买流程"><li><a href="/orders/"><span>01</span>购物车</a></li><li><a href="/checkout/"><span>02</span>确认订单</a></li><li class="current"><span>03</span>支付演示</li></ol>
+    <div id="missing-payment" class="missing-payment" hidden><Icon name="cart" size={45}/><h2>还没有可支付的演示订单。</h2><p>请先完成产品选购与收货信息填写。</p><a href="/orders/" class="button button-dark">返回购物车 <Icon name="arrow" size={18}/></a></div>
+    <div class="payment-layout" id="payment-layout" hidden>
+      <div class="payment-detail"><span class="order-status"><span></span>演示订单 · 等待模拟支付</span><div class="payment-order-header"><h2>订单已生成</h2><p>订单编号 <strong id="payment-order-id"></strong></p><p>创建时间 <span id="payment-created"></span></p></div><div class="payment-products">{products.map(product => <a href={`/products/${product.slug}/`} class="payment-product" data-payment-item={product.slug} hidden><img src={product.image} alt={product.name} width="78" height="78"/><div><h3>{product.name}</h3><p>数量 <span data-payment-quantity={product.slug}>1</span> <span>查看详情 <Icon name="diagonal" size={12}/></span></p></div><strong data-payment-subtotal={product.slug}></strong></a>)}</div><div class="delivery-summary"><span>收货信息</span><strong id="payment-recipient"></strong><p id="payment-address"></p></div><a href="/checkout/" class="edit-order">← 返回修改订单</a></div>
+      <section class="payment-console" aria-labelledby="payment-panel-title"><div class="payment-console-top"><span class="eyebrow">PAYMENT PREVIEW</span><span class="demo-pill">支付演示</span></div><h2 id="payment-panel-title">选择支付方式</h2><p class="pay-amount-label">演示订单金额</p><strong class="pay-amount" id="payment-total">¥0</strong><div class="payment-methods"><label class="payment-method"><input type="radio" name="pay-method" value="wechat" checked/><span class="method-brand wechat">微</span><div><strong>微信支付</strong><small>WeChat Pay</small></div><span class="method-check"><Icon name="check" size={15}/></span></label><label class="payment-method"><input type="radio" name="pay-method" value="alipay"/><span class="method-brand alipay">支</span><div><strong>支付宝</strong><small>Alipay</small></div><span class="method-check"><Icon name="check" size={15}/></span></label></div><div class="payment-preview-box"><div class="preview-symbol"><Icon name="shield" size={39}/></div><strong id="selected-method-label">微信支付演示</strong><p>通过下方按钮体验订单完成流程。<br/>无需扫码，无需支付账户，不会扣款。</p><span>DEMO ONLY · NO CHARGE</span></div><button class="button demo-pay" type="button" id="simulate-payment">模拟完成支付 <Icon name="arrow" size={19}/></button><p class="payment-confirm-note">当前没有接入商户收款服务，演示完成后不会创建真实交易或安排发货。</p><p id="payment-error" class="payment-error" role="alert"></p></section>
+    </div>
+    <div class="payment-help"><Icon name="shield" size={17}/><span>正式上线时需配置微信 / 支付宝商户接口、服务端订单与支付回调。</span><button type="button" data-inquiry>咨询产品与配置 <Icon name="diagonal" size={14}/></button></div>
+  </section>
+  <script>
+    import { products, formatPrice } from '../../data/catalog';
+    import { ORDER_KEY, getDemoOrder, getOrderTotal, getCart, writeStored, setQuantity, removeFromCart, navigateTo } from '../../lib/cart';
+    let order = getDemoOrder();
+    function renderPayment() {
+      order = getDemoOrder();
+      if (order?.status === 'demo_complete') { navigateTo('/orders/success/', true); return; }
+      document.getElementById('payment-layout')!.hidden = !order;
+      document.getElementById('missing-payment')!.hidden = Boolean(order);
+      if (!order) return;
+      document.getElementById('payment-order-id')!.textContent = order.id;
+      const created = new Date(order.createdAt);
+      document.getElementById('payment-created')!.textContent = Number.isNaN(created.getTime()) ? '当前演示订单' : created.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false });
+      document.getElementById('payment-total')!.textContent = formatPrice(getOrderTotal(order));
+      document.getElementById('payment-recipient')!.textContent = `${order.recipient} · ${order.phone.replace(/(\d{3})\d{4}(\d{4})$/, '$1****$2')}`;
+      document.getElementById('payment-address')!.textContent = `${order.region} ${order.address}`;
+      document.querySelectorAll<HTMLElement>('[data-payment-item]').forEach(row => { const item = order!.items.find(item => item.slug === row.dataset.paymentItem); row.hidden = !item; if (item) { row.querySelector('[data-payment-quantity]')!.textContent = String(item.quantity); row.querySelector('[data-payment-subtotal]')!.textContent = formatPrice(item.priceCNY * item.quantity); } });
+      const selectedRadio = document.querySelector<HTMLInputElement>(`input[name="pay-method"][value="${order.method}"]`);
+      if (selectedRadio) selectedRadio.checked = true;
+      document.getElementById('selected-method-label')!.textContent = order.method === 'alipay' ? '支付宝支付演示' : '微信支付演示';
+    }
+    document.querySelectorAll<HTMLInputElement>('input[name="pay-method"]').forEach(input => input.addEventListener('change', () => {
+      if (!order) return;
+      const latest = getDemoOrder();
+      if (!latest || latest.id !== order.id || latest.status === 'demo_complete') { renderPayment(); document.getElementById('payment-error')!.textContent = '订单已更新，请核对当前订单后继续。'; return; }
+      order = latest;
+      order.method = input.value === 'alipay' ? 'alipay' : 'wechat';
+      writeStored(ORDER_KEY, order);
+      document.getElementById('selected-method-label')!.textContent = order.method === 'alipay' ? '支付宝支付演示' : '微信支付演示';
+    }));
+    let processing = false;
+    document.getElementById('simulate-payment')?.addEventListener('click', () => {
+      if (processing) return;
+      const latest = getDemoOrder();
+      if (!latest) { renderPayment(); document.getElementById('payment-error')!.textContent = '未找到演示订单，请返回购物车重新结算。'; return; }
+      if (!order || latest.id !== order.id) { renderPayment(); document.getElementById('payment-error')!.textContent = '订单已更新，请核对当前产品与金额后再次确认。'; return; }
+      order = latest;
+      if (order.status === 'demo_complete') { navigateTo('/orders/success/'); return; }
+      processing = true;
+      const button = document.getElementById('simulate-payment') as HTMLButtonElement;
+      button.disabled = true;
+      button.textContent = '正在完成演示…';
+      order.status = 'demo_complete';
+      writeStored(ORDER_KEY, order);
+      // Remove purchased quantities only; items outside this order remain in the cart.
+      order.items.forEach(purchased => {
+        const current = getCart().find(item => item.slug === purchased.slug);
+        if (!current) return;
+        if (current.quantity > purchased.quantity) setQuantity(current.slug, current.quantity - purchased.quantity);
+        else removeFromCart(current.slug);
+      });
+      navigateTo('/orders/success/');
+    });
+    window.addEventListener('pageshow', renderPayment);
+    window.addEventListener('storage', event => { if (event.key === ORDER_KEY || event.key === null) renderPayment(); });
+    renderPayment();
+  </script>
+  <style>
+    .payment-page{padding-top:128px;padding-bottom:67px;max-width:1280px}.breadcrumb{display:flex;gap:12px;color:#939da9;font-size:12px;margin-bottom:30px;flex-wrap:wrap}.breadcrumb a:hover{color:#1677ff}.payment-heading .eyebrow{color:#1677ff;font-size:10px;letter-spacing:2px}.payment-heading h1{font-size:40px;letter-spacing:-1px;font-weight:600;margin:12px 0}.payment-heading p{font-size:13px;color:#7f8997}.checkout-steps{display:flex;align-items:center;list-style:none;margin:32px 0;padding:18px 0;border-top:1px solid #e8ebf0;border-bottom:1px solid #e8ebf0;gap:50px;color:#9ba1ab;font-size:12px}.checkout-steps li,.checkout-steps a{display:flex;align-items:center;gap:11px}.checkout-steps span{display:inline-flex;justify-content:center;align-items:center;height:25px;width:25px;border:1px solid #dbe0e7;border-radius:50%;font-size:10px}.checkout-steps .current{color:#1677ff}.checkout-steps .current span{background:#1677ff;border-color:#1677ff;color:#fff}.payment-layout{display:grid;grid-template-columns:minmax(0,1fr) 440px;border:1px solid #e5eaf1;align-items:stretch}.payment-detail{padding:38px 42px}.order-status{font-size:10px;color:#7e8a9d;display:flex;align-items:center;gap:7px}.order-status>span{width:5px;height:5px;background:#1677ff;border-radius:50%}.payment-order-header h2{font-size:28px;font-weight:550;margin:18px 0 15px}.payment-order-header p{font-size:11px;color:#9aa5b3;line-height:2.2}.payment-order-header p strong{font-size:11px;color:#65778d;font-weight:500;margin-left:7px}.payment-order-header p>span{margin-left:7px;color:#7c8a9c}.payment-products{margin:28px 0 25px;max-height:420px;overflow:auto;border-top:1px solid #e7ecf2}.payment-product{display:flex;gap:17px;align-items:center;border-bottom:1px solid #e7ecf2;padding:19px 0}.payment-product img{width:74px;height:74px;background:#f3f5f8;object-fit:contain;flex-shrink:0}.payment-product h3{font-size:15px;font-weight:550;margin-bottom:8px}.payment-product p{font-size:10px;color:#9aa3b0}.payment-product p>span:last-child{display:inline-flex;align-items:center;gap:5px;color:#1677ff;margin-left:20px}.payment-product>strong{margin-left:auto;font-size:13px;font-weight:500;white-space:nowrap}.delivery-summary{padding:20px;background:#f7f9fc}.delivery-summary>span{display:block;color:#909caf;font-size:10px;margin-bottom:9px}.delivery-summary>strong{font-size:12px;font-weight:500;color:#5d718b}.delivery-summary>p{font-size:11px;color:#909dad;margin-top:7px;line-height:1.8}.edit-order{display:inline-flex;margin-top:23px;font-size:11px;color:#8a9bb0}.payment-console{padding:35px 35px 30px;background:linear-gradient(140deg,#f6f9fd,#eef4fc);border-left:1px solid #e4eaf3}.payment-console-top{display:flex;justify-content:space-between;align-items:center}.payment-console-top .eyebrow{font-size:9px;letter-spacing:1.6px;color:#7e93b0}.demo-pill{font-size:9px;background:#e0ebfd;color:#1677ff;padding:4px 9px}.payment-console h2{font-size:23px;font-weight:550;margin:22px 0 20px}.pay-amount-label{font-size:11px;color:#9ba6b6}.pay-amount{font-size:44px;font-weight:600;letter-spacing:-1px;line-height:1.5;color:#152238}.payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.payment-method{padding:15px 13px;display:flex;gap:9px;align-items:center;border:1px solid #d8e2f0;background:#fff;position:relative;cursor:pointer}.payment-method:has(input:checked){border-color:#1677ff;box-shadow:0 0 0 1px #1677ff}.payment-method input{position:absolute;inset:0;opacity:0;height:100%;width:100%;margin:0;cursor:pointer}.payment-method:has(input:focus-visible){outline:3px solid #1677ff;outline-offset:4px}.method-brand{display:flex;justify-content:center;align-items:center;width:28px;height:28px;border-radius:5px;color:#fff;font-size:16px;font-weight:bold;flex-shrink:0}.wechat{background:#1dae61}.alipay{background:#1697e9}.payment-method strong{font-size:11px;font-weight:550}.payment-method small{display:block;font-size:8px;color:#9da9b8;margin-top:2px}.method-check{width:14px;height:14px;display:flex;align-items:center;justify-content:center;background:#e7ebf1;border-radius:50%;color:transparent;margin-left:auto;flex-shrink:0}.payment-method:has(input:checked) .method-check{color:#fff;background:#1677ff}.payment-preview-box{padding:30px 16px 21px;text-align:center;background:#fff;border:1px solid #e2e9f4;margin-top:23px;position:relative;overflow:hidden}.payment-preview-box:before{content:'';position:absolute;inset:0;background:linear-gradient(#227bfc08 1px,transparent 1px),linear-gradient(90deg,#227bfc08 1px,transparent 1px);background-size:18px 18px;mask-image:linear-gradient(#000,transparent);pointer-events:none}.preview-symbol{height:67px;width:67px;background:#edf4ff;color:#1677ff;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;border-radius:50%;position:relative}.payment-preview-box>strong{font-size:13px;font-weight:550;position:relative}.payment-preview-box p{font-size:11px;color:#8d9aaf;line-height:1.85;margin-top:9px}.payment-preview-box>span{display:block;margin-top:17px;font-size:8px;letter-spacing:1.8px;color:#b0bacc}.demo-pay{width:100%;background:#1677ff;color:#fff;font-size:13px;gap:15px;min-height:52px;margin-top:20px;border:0}.payment-confirm-note{font-size:10px;color:#93a0b5;text-align:center;line-height:1.9;margin-top:14px}.payment-error{font-size:11px;color:#d54c42;margin-top:10px}.payment-help{display:flex;align-items:center;gap:9px;color:#919daf;font-size:10px;margin-top:23px}.payment-help>svg{color:#1677ff;flex-shrink:0}.payment-help button{margin-left:auto;background:transparent;display:flex;align-items:center;gap:7px;color:#72839a;font-size:11px}.missing-payment{padding:60px 20px;background:#f6f8fc;text-align:center}.missing-payment>svg{margin:auto auto 20px;color:#1677ff}.missing-payment h2{font-size:25px;margin-bottom:12px}.missing-payment p{font-size:13px;color:#8b99ac;margin-bottom:25px}.missing-payment .button{background:#1677ff}@media(max-width:1000px){.payment-layout{grid-template-columns:minmax(0,1fr) 390px}.payment-detail{padding:32px 26px}.payment-console{padding:30px 25px}.payment-product{gap:12px}.payment-product h3{font-size:13px}.payment-product img{width:62px;height:62px}.payment-product p>span:last-child{margin-left:8px}.payment-product>strong{font-size:12px}}@media(max-width:760px){.payment-page{padding-top:108px;padding-bottom:40px}.payment-heading h1{font-size:30px}.payment-heading p{font-size:12px}.checkout-steps{gap:20px;font-size:10px;margin:26px 0}.checkout-steps li,.checkout-steps a{gap:8px}.payment-layout{grid-template-columns:1fr}.payment-detail{padding:26px 20px}.payment-console{border-left:0;border-top:1px solid #e2e9f2;padding:28px 22px}.payment-order-header h2{font-size:25px}.payment-order-header p strong{font-size:10px}.payment-products{margin:22px 0}.payment-product img{width:68px;height:68px}.payment-product h3{font-size:14px}.payment-product>strong{font-size:12px}.payment-help{flex-wrap:wrap;line-height:1.9;align-items:flex-start}.payment-help>svg{margin-top:2px}.payment-help>span{flex:1}.payment-help button{margin-left:25px;flex-basis:100%}.pay-amount{font-size:40px}.payment-preview-box{padding-top:26px}.missing-payment h2{font-size:22px}}
+  </style>
+</Layout>

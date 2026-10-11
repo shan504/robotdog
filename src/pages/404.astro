@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+---
+<Layout title="页面未找到｜RobotDog" description="你访问的页面可能已移动或不存在。返回 RobotDog 首页，或浏览机器狗产品系列。" noindex>
+  <section class="section error-page">
+    <div class="container error-inner">
+      <span class="eyebrow">A NEW DIRECTION</span>
+      <p class="error-code" aria-hidden="true">404<span>↗</span></p>
+      <h1>这条路线，暂时走不通。</h1>
+      <p class="error-description">你访问的页面可能已移动或不存在。<br/>换个方向，继续探索机器狗的更多可能。</p>
+      <div class="error-actions"><a class="button button-dark" href="/">返回首页 <Icon name="arrow"/></a><a class="button button-outline" href="/products/">探索产品 <Icon name="diagonal"/></a></div>
+    </div>
+  </section>
+</Layout>
+<style>
+  .error-page { padding-top: 160px; padding-bottom: 120px; }
+  .error-inner { text-align: center; }
+  .error-code { font-size: clamp(110px, 20vw, 230px); font-weight: 650; letter-spacing: -.08em; line-height: 1; margin: 32px 0; }
+  .error-code span { color: #a1ba72; font-size: .54em; vertical-align: top; display: inline-block; margin-top: .18em; padding-left: .16em; }
+  h1 { font-size: clamp(26px, 4vw, 42px); letter-spacing: -.04em; }
+  .error-description { color: var(--muted, #6b746b); line-height: 1.9; margin: 20px 0 32px; }
+  .error-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  @media (max-width: 640px) { .error-page { padding-top: 120px; padding-bottom: 80px; } }
+</style>

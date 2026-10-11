@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+---
+<Layout title="隐私说明｜RobotDog 机器狗" description="了解 RobotDog 网站预览版如何处理产品询价信息：数据仅在当前浏览器生成，可下载保存，不会自动发送。">
+  <section class="section privacy-page">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="面包屑导航"><a href="/">首页</a><span aria-hidden="true">/</span><span aria-current="page">隐私说明</span></nav>
+      <div class="page-heading"><span class="eyebrow">YOUR PRIVACY</span><h1>隐私说明</h1><p>清楚了解你的信息如何使用。</p></div>
+      <div class="privacy-content prose">
+        <div class="privacy-summary"><Icon name="shield" size={26}/><p>当前网站为产品展示预览版。询价信息仅在当前浏览器中处理，提交表单会生成一份可下载的询价单，不会自动发送给 RobotDog 或任何销售团队。</p></div>
+        <h2>产品询价信息</h2>
+        <p>询价表单会使用你填写的称呼、联系邮箱、感兴趣的产品和使用需求，整理成询价单。生成和下载由浏览器完成，网站当前没有接收询价信息的服务器接口。</p>
+        <p>这些内容暂存在当前页面的内存中，没有写入网站的本地持久存储。刷新或关闭页面后，页面中的填写内容与生成结果将不再保留；你主动下载的文件会保存在所使用的设备中。</p>
+        <h2>下载与分享</h2>
+        <p>点击“下载询价单”后，浏览器会保存一个文本文件，其中包含你填写的联系方式与需求。请妥善保管该文件，仅在需要时主动分享给你确认的接收方。</p>
+        <p>生成询价单不代表已经发出询价，也不代表订单或服务已经成立。正式上线并提供销售联系方式后，才可以按照届时公布的流程联系销售团队。</p>
+        <h2>购物车、结算与演示订单</h2>
+        <p>购物车、商品勾选、结算草稿和演示订单保存在当前浏览器的本地存储中。结算草稿和订单包含你填写的称呼、电话、地区、地址、发票与备注，以便刷新后继续预览。它们不会提交到服务器，也不会在其他设备上同步。</p>
+        <p>支付页面只演示微信与支付宝的选择及完成流程，不会发起支付、扣款或产生真实交易。建议使用示例联系资料体验。离线预览在本地存储不可用时使用预览窗口的临时内存，关闭窗口后不再保留。</p>
+        <p>在共用设备上体验后，可点击下方按钮清除本网站保存在当前浏览器中的购物车、结算资料和演示订单。已下载文件需要自行删除。</p>
+        <button class="button button-outline" id="clear-preview-data">清除本地购物资料</button><p id="clear-data-result" role="status"></p>
+        <h2>网站访问</h2>
+        <p>当前版本未接入第三方统计、广告追踪或在线客服工具，也未设置用于追踪访问者的 Cookie。浏览器仍需向网站托管服务请求页面、图片和其他静态资源；托管服务可能依其配置记录基本访问日志。</p>
+        <h2>内容更新</h2>
+        <p>如果未来增加在线询价提交、用户账户、访问统计或其他涉及个人信息的功能，我们将在相关功能上线前更新本说明，说明信息用途、处理方式及适用的联系渠道。</p>
+        <h2>使用建议</h2>
+        <p>请仅填写产品咨询所需的信息，不要在需求描述中提供身份证号码、密码或其他敏感信息。如不希望在当前浏览器保留表单内容，可关闭页面；下载文件请在设备上自行管理或删除。</p>
+      </div>
+      <a class="button button-outline privacy-back" href="/">返回首页 <Icon name="arrow" size={18}/></a>
+    </div>
+  </section>
+</Layout>
+<style>
+  .privacy-page { padding-top: 136px; }
+  .privacy-page .page-heading { padding-top: 0; padding-bottom: 40px; }
+  .privacy-content { max-width: 800px; }
+  .privacy-summary { display: flex; gap: 18px; padding: 26px; border: 1px solid var(--line, #e7e9ee); border-radius: 12px; margin-bottom: 38px; background: #f2f6fd; }
+  .privacy-summary svg { flex: 0 0 auto; margin-top: 4px; }
+  .privacy-summary p { margin: 0; }
+  .privacy-back { margin-top: 34px; }
+  @media (max-width: 640px) { .privacy-page { padding-top: 108px; } .privacy-summary { padding: 20px; gap: 12px; } }
+</style>
+<script>
+  import { clearCart, removeStored, CHECKOUT_KEY, ORDER_KEY } from '../lib/cart';
+  document.getElementById('clear-preview-data')?.addEventListener('click', () => {
+    clearCart(); removeStored(CHECKOUT_KEY); removeStored(ORDER_KEY);
+    const result = document.getElementById('clear-data-result');
+    if (result) result.textContent = '当前浏览器中的购物资料已清除。';
+  });
+</script>

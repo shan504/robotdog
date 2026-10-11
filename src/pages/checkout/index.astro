@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { products, formatPrice } from '../../data/catalog';
+---
+<Layout title="确认订单与收货信息｜RobotDog" description="确认已选机器狗与配件，填写收货信息并选择微信或支付宝支付演示。" noindex>
+  <section class="checkout-page container">
+    <div class="breadcrumb"><a href="/products/">产品系列</a><span>/</span><a href="/orders/">购物车</a><span>/</span><span>确认订单</span></div>
+    <div class="checkout-heading"><span class="eyebrow">READY FOR THE NEXT STEP</span><h1>让探索，准备出发。</h1><p>核对装备与收货信息，完成你的机器人订单。</p></div>
+    <ol class="checkout-steps" aria-label="购买流程"><li><a href="/orders/"><span>01</span>购物车</a></li><li class="current"><span>02</span>确认订单</li><li><span>03</span>支付演示</li></ol>
+    <div class="no-order" id="no-order" hidden><Icon name="cart" size={46}/><h2>还没有待结算的产品。</h2><p>先选一台机器狗，或者回到购物车勾选需要的产品。</p><a href="/orders/" class="button button-dark">返回购物车 <Icon name="arrow" size={18}/></a></div>
+    <form id="checkout-form" class="checkout-grid">
+      <div class="checkout-main">
+        <section class="checkout-card"><div class="card-title"><span>01</span><h2>收货与联系信息</h2><Icon name="shield" size={19}/></div><div class="form-grid"><label>收货人 <span>*</span><input name="recipient" autocomplete="name" required maxlength="60" placeholder="请输入收货人姓名"/></label><label>联系电话 <span>*</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[+0-9 ()-]{7,20}" maxlength="20" title="请输入 7–20 位有效联系电话，可包含 +、空格或连字符" placeholder="用于联系与配送"/></label><label class="full-width">所在地区 <span>*</span><input name="region" autocomplete="address-level1" required maxlength="100" placeholder="省 / 市 / 区，例如：浙江省 杭州市 滨江区"/></label><label class="full-width">详细地址 <span>*</span><input name="address" autocomplete="street-address" required maxlength="200" placeholder="街道、门牌号、楼栋及房间号"/></label></div><p class="privacy-note"><Icon name="shield" size={14}/>演示信息仅保存在当前浏览器，不会提交至服务器。请使用测试信息体验流程。<a href="/privacy/">隐私说明</a></p></section>
+        <section class="checkout-card"><div class="card-title"><span>02</span><h2>配送与附加信息</h2></div><div class="delivery-option"><Icon name="arrow" size={22}/><div><strong>标准配送</strong><p>展示订单免运费；实际运费与交付周期需在正式下单时确认。</p></div><span>¥0</span></div><div class="form-grid"><label class="full-width">发票信息 <small>选填</small><input name="invoice" maxlength="160" placeholder="个人 / 企业抬头，演示版不生成真实发票"/></label><label class="full-width">订单备注 <small>选填</small><textarea name="note" rows="3" maxlength="500" placeholder="例如：教学用途、开发平台或配置需求"></textarea></label></div></section>
+        <section class="checkout-card"><div class="card-title"><span>03</span><h2>支付方式</h2></div><div class="payment-options"><label class="payment-option"><input type="radio" name="method" value="wechat" checked/><span class="payment-brand wechat">微</span><div><strong>微信支付</strong><small>演示支付流程</small></div><span class="method-check"><Icon name="check" size={15}/></span></label><label class="payment-option"><input type="radio" name="method" value="alipay"/><span class="payment-brand alipay">支</span><div><strong>支付宝</strong><small>演示支付流程</small></div><span class="method-check"><Icon name="check" size={15}/></span></label></div><p class="payment-demo-note">当前未接入真实支付。下一步仅展示支付界面，不会扣款。</p></section>
+      </div>
+      <aside class="order-summary"><div class="summary-heading"><h2>订单清单</h2><a href="/orders/">修改 <Icon name="diagonal" size={13}/></a></div><div class="summary-items">{products.map(product => <div class="summary-item" data-summary-item={product.slug} hidden><img src={product.image} alt={product.name} width="76" height="76"/><div><h3>{product.name}</h3><span><span data-summary-price={product.slug}>{formatPrice(product.priceCNY)}</span> × <span data-summary-quantity={product.slug}>1</span></span></div><strong data-summary-total={product.slug}>{formatPrice(product.priceCNY)}</strong></div>)}</div><dl class="summary-totals"><div><dt>商品金额</dt><dd id="checkout-subtotal">¥0</dd></div><div><dt>配送运费</dt><dd>¥0</dd></div><div><dt>商品件数</dt><dd id="checkout-count">0 件</dd></div></dl><div class="grand-total"><span>应付金额</span><strong id="checkout-total">¥0</strong></div><div class="demo-tag"><span></span>预览订单 · 支付演示</div><label class="agreement"><input type="checkbox" name="agree" required/><span>我已确认以上产品与收货信息，了解本次为演示订单，不产生真实交易。</span></label><button class="button submit-order" type="submit" id="submit-order">提交订单，前往支付 <Icon name="arrow" size={18}/></button><a href="/orders/" class="back-cart">← 返回购物车</a><p id="checkout-error" class="checkout-error" role="alert"></p></aside>
+    </form>
+  </section>
+  <script>
+    import { products, formatPrice } from '../../data/catalog';
+    import { CART_EVENT, CHECKOUT_KEY, ORDER_KEY, getSelectedCart, readStored, writeStored, navigateTo, type DemoOrder } from '../../lib/cart';
+    const form = document.getElementById('checkout-form') as HTMLFormElement;
+    const fields = ['recipient', 'phone', 'region', 'address', 'invoice', 'note'];
+    const draft = readStored<Record<string, unknown>>(CHECKOUT_KEY);
+    if (draft && typeof draft === 'object') {
+      fields.forEach(name => { if (typeof draft[name] === 'string') (form.elements.namedItem(name) as HTMLInputElement).value = draft[name] as string; });
+      const method = draft.method === 'alipay' ? 'alipay' : 'wechat';
+      (form.querySelector(`input[name="method"][value="${method}"]`) as HTMLInputElement).checked = true;
+    }
+    function saveDraft() {
+      const data = new FormData(form);
+      writeStored(CHECKOUT_KEY, Object.fromEntries([...fields, 'method'].map(name => [name, String(data.get(name) || '').trim()])));
+    }
+    function renderSummary() {
+      const items = getSelectedCart();
+      form.hidden = items.length === 0;
+      document.getElementById('no-order')!.hidden = items.length > 0;
+      let total = 0, count = 0;
+      document.querySelectorAll<HTMLElement>('[data-summary-item]').forEach(row => {
+        const item = items.find(item => item.slug === row.dataset.summaryItem);
+        row.hidden = !item;
+        if (!item) return;
+        const product = products.find(product => product.slug === item.slug)!;
+        row.querySelector<HTMLElement>('[data-summary-quantity]')!.textContent = String(item.quantity);
+        row.querySelector<HTMLElement>('[data-summary-total]')!.textContent = formatPrice(product.priceCNY * item.quantity);
+        total += product.priceCNY * item.quantity;
+        count += item.quantity;
+      });
+      document.getElementById('checkout-subtotal')!.textContent = formatPrice(total);
+      document.getElementById('checkout-total')!.textContent = formatPrice(total);
+      document.getElementById('checkout-count')!.textContent = `${count} 件`;
+    }
+    form.addEventListener('input', saveDraft);
+    form.addEventListener('change', saveDraft);
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const items = getSelectedCart();
+      if (!items.length) { renderSummary(); return; }
+      const data = new FormData(form);
+      const getField = (name: string) => String(data.get(name) || '').trim();
+      if (['recipient', 'phone', 'region', 'address'].some(name => !getField(name))) {
+        document.getElementById('checkout-error')!.textContent = '请填写完整的收货与联系信息，内容不能只有空格。';
+        return;
+      }
+      const phoneDigits = getField('phone').replace(/\D/g, '');
+      if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+        document.getElementById('checkout-error')!.textContent = '请填写有效联系电话，需包含 7–15 位数字。';
+        (form.elements.namedItem('phone') as HTMLInputElement).focus();
+        return;
+      }
+      saveDraft();
+      const now = new Date();
+      const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+      const order: DemoOrder = {
+        id: `RD${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${now.getTime().toString(36).toUpperCase()}-${suffix}`,
+        createdAt: now.toISOString(), status: 'awaiting_demo_payment', method: data.get('method') === 'alipay' ? 'alipay' : 'wechat', recipient: getField('recipient'), phone: getField('phone'), region: getField('region'), address: getField('address'), invoice: getField('invoice'), note: getField('note'),
+        items: items.map(item => { const product = products.find(product => product.slug === item.slug)!; return { slug: product.slug, name: product.name, priceCNY: product.priceCNY, quantity: item.quantity }; }),
+      };
+      writeStored(ORDER_KEY, order);
+      navigateTo('/payment/');
+    });
+    window.addEventListener(CART_EVENT, renderSummary);
+    window.addEventListener('pageshow', renderSummary);
+    renderSummary();
+  </script>
+  <style>
+    .checkout-page{padding-top:128px;padding-bottom:70px;max-width:1328px}.breadcrumb{display:flex;gap:12px;color:#929aa7;font-size:12px;margin-bottom:30px}.breadcrumb a:hover{color:#1677ff}.checkout-heading .eyebrow{color:#1677ff;font-size:10px;letter-spacing:2px}.checkout-heading h1{font-size:40px;letter-spacing:-1px;font-weight:600;margin:12px 0}.checkout-heading p{color:#7f8794;font-size:13px}.checkout-steps{display:flex;align-items:center;list-style:none;margin:32px 0;padding:18px 0;border-top:1px solid #e8ebf0;border-bottom:1px solid #e8ebf0;gap:50px;color:#9ba1ab;font-size:12px}.checkout-steps li,.checkout-steps a{display:flex;align-items:center;gap:11px}.checkout-steps span{display:inline-flex;justify-content:center;align-items:center;height:25px;width:25px;border:1px solid #dbe0e7;border-radius:50%;font-size:10px}.checkout-steps .current{color:#1677ff}.checkout-steps .current span{background:#1677ff;border-color:#1677ff;color:#fff}.checkout-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:32px;align-items:start}.checkout-main{display:flex;flex-direction:column;gap:23px}.checkout-card{border:1px solid #e6eaf0;padding:29px 30px}.card-title{display:flex;align-items:center;gap:12px;margin-bottom:25px}.card-title>span{font-size:11px;color:#1677ff;letter-spacing:1px}.card-title h2{font-size:18px;font-weight:550}.card-title>svg{margin-left:auto;color:#98a8ba}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}.form-grid label{font-size:12px;color:#5d6877;display:block}.form-grid label>span{color:#1677ff}.form-grid label small{color:#a0a7b1;margin-left:6px}.form-grid input,.form-grid textarea{display:block;width:100%;padding:12px 14px;font-size:13px;margin-top:8px;border:1px solid #dde3eb;background:#fff;border-radius:0;color:#1d2734;outline-color:#1677ff}.form-grid input::placeholder,.form-grid textarea::placeholder{color:#a8afb9;font-size:12px}.form-grid textarea{resize:vertical}.full-width{grid-column:1/-1}.privacy-note{font-size:10px;color:#8792a0;margin-top:20px;line-height:1.8;display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.privacy-note svg{flex-shrink:0;margin-top:2px}.privacy-note a{color:#1677ff}.delivery-option{display:flex;align-items:center;gap:15px;padding:16px;background:#f6f8fb;margin-bottom:24px}.delivery-option svg{color:#1677ff;flex-shrink:0}.delivery-option strong{font-size:13px;font-weight:500}.delivery-option p{font-size:10px;color:#9099a7;margin-top:4px}.delivery-option>span{margin-left:auto;font-size:14px}.payment-options{display:grid;grid-template-columns:1fr 1fr;gap:16px}.payment-option{display:flex;align-items:center;gap:10px;border:1px solid #e0e5ed;padding:18px 14px;position:relative;cursor:pointer}.payment-option:has(input:checked){border-color:#1677ff;background:#f4f8ff}.payment-option input{position:absolute;width:100%;height:100%;inset:0;opacity:0;margin:0;cursor:pointer}.payment-option:has(input:focus-visible){outline:3px solid #1677ff;outline-offset:3px}.payment-brand{display:flex;align-items:center;justify-content:center;border-radius:6px;width:33px;height:33px;color:#fff;font-size:19px;font-weight:bold;flex-shrink:0}.wechat{background:#20af60}.alipay{background:#1698eb}.payment-option strong{font-size:12px;font-weight:550}.payment-option small{display:block;color:#939ba7;font-size:10px;margin-top:2px}.method-check{margin-left:auto;background:#e3e7ec;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:transparent;flex-shrink:0}.payment-option:has(input:checked) .method-check{background:#1677ff;color:#fff}.payment-demo-note{font-size:10px;color:#8b96a5;margin-top:15px}.order-summary{background:#f7f8fa;padding:27px 25px;position:sticky;top:105px;border:1px solid #edf0f4}.summary-heading{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e1e6ed;padding-bottom:20px}.summary-heading h2{font-size:18px;font-weight:550}.summary-heading a{display:flex;gap:5px;align-items:center;font-size:10px;color:#8291a4}.summary-items{max-height:360px;overflow:auto;margin:6px 0 20px}.summary-item{display:flex;align-items:center;gap:11px;padding:17px 0;border-bottom:1px solid #e5e9f0}.summary-item img{width:65px;height:65px;object-fit:contain;background:#ecf0f5;flex-shrink:0}.summary-item>div{min-width:0}.summary-item h3{font-size:12px;font-weight:550;line-height:1.45}.summary-item>div>span{color:#939ca9;font-size:10px;display:block;margin-top:7px}.summary-item>strong{font-size:12px;font-weight:500;white-space:nowrap;margin-left:auto}.summary-totals{margin:0;padding:0 0 20px;display:flex;flex-direction:column;gap:12px;font-size:11px;color:#8c96a4;border-bottom:1px solid #dfe5ec}.summary-totals>div{display:flex;justify-content:space-between;gap:20px}.summary-totals dd{margin:0;color:#4b5c6f}.grand-total{display:flex;align-items:center;justify-content:space-between;margin-top:22px}.grand-total>span{font-size:12px;color:#697589}.grand-total strong{font-size:29px;font-weight:600;color:#111c2d;line-height:1.3}.demo-tag{display:flex;justify-content:flex-end;gap:6px;align-items:center;font-size:9px;color:#1677ff;margin:8px 0 22px}.demo-tag>span{height:4px;width:4px;background:#1677ff;border-radius:50%}.agreement{display:flex;align-items:flex-start;gap:9px;font-size:10px;line-height:1.8;color:#8d97a5;margin-bottom:20px}.agreement input{margin-top:3px;accent-color:#1677ff;flex-shrink:0}.submit-order{background:#1677ff;color:#fff;width:100%;gap:13px;font-size:12px;border:0;min-height:50px}.back-cart{display:block;text-align:center;font-size:11px;color:#8b96a5;margin-top:16px}.checkout-error{color:#d94e42;font-size:11px;margin-top:15px;line-height:1.8}.no-order{padding:55px;text-align:center;background:#f5f7fa}.no-order>svg{color:#1677ff;margin:0 auto 22px}.no-order h2{font-size:25px;margin-bottom:12px}.no-order p{font-size:13px;color:#8b96a5;margin-bottom:25px}.no-order .button{background:#1677ff}@media(max-width:1050px){.checkout-grid{grid-template-columns:minmax(0,1fr) 340px;gap:20px}.checkout-card{padding:24px 22px}.payment-options{grid-template-columns:1fr}.order-summary{padding:23px 20px}.summary-item img{width:50px;height:55px}.summary-item>strong{font-size:11px}.grand-total strong{font-size:25px}}@media(max-width:760px){.checkout-page{padding-top:108px;padding-bottom:40px}.checkout-heading h1{font-size:30px}.checkout-heading p{font-size:12px}.checkout-grid{grid-template-columns:1fr;gap:23px}.checkout-card{padding:23px 18px}.form-grid{grid-template-columns:1fr;gap:18px}.checkout-steps{gap:23px;font-size:10px;margin:26px 0}.checkout-steps li,.checkout-steps a{gap:8px}.card-title h2{font-size:17px}.form-grid input,.form-grid textarea{font-size:16px}.payment-options{grid-template-columns:1fr 1fr;gap:10px}.payment-option{padding:16px 11px;gap:9px}.payment-brand{width:28px;height:28px;font-size:16px}.payment-option strong{font-size:11px}.payment-option small{font-size:9px}.method-check{width:14px;height:14px}.order-summary{position:static;padding:25px 22px}.summary-item img{width:67px;height:67px}.summary-item h3{font-size:13px}.grand-total strong{font-size:28px}.privacy-note{font-size:10px}.delivery-option{padding:15px 12px}.delivery-option p{font-size:9px}.no-order{padding:45px 20px}.no-order h2{font-size:23px}}
+  </style>
+</Layout>

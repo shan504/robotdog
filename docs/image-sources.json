@@ -1,0 +1,626 @@
+{
+  "collection_date": "2026-10-11",
+  "purpose": "RobotDog 商城效果预览",
+  "network_note": "Unitree 官网及商城/官方 CDN 当前运行环境返回 CONNECT 403；未绕过网络限制。使用可正常读取的官方开源仓库模型，并记录真实来源。",
+  "assets": [
+    {
+      "family": "a1",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "DeepMind MuJoCo Menagerie 收录的 Unitree 原始模型",
+      "source_page": "https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_a1",
+      "model_url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/main/unitree_a1/a1.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/main/unitree_a1/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/a1.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 51706,
+          "sha256": "aa7f063b441677dceeb4b909ff13d644c60fa1418f7f346a1efb59bee619f848",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/a1-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 121367,
+          "sha256": "5607e9eecd3831774e464dcdf960210735a83d9a249c016ecf47d52e96e22864",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/a1.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 121367,
+          "sha256": "5607e9eecd3831774e464dcdf960210735a83d9a249c016ecf47d52e96e22864",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "go1",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "DeepMind MuJoCo Menagerie 收录的 Unitree 原始模型",
+      "source_page": "https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_go1",
+      "model_url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/main/unitree_go1/go1.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/main/unitree_go1/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/go1.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 43573,
+          "sha256": "3dc250db7e45d1ea1d814206c36a3fc59456a00d314794fba2204477af8eb595",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/go1-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 90628,
+          "sha256": "e05e2db2be2d34ecffb28b6341743e54de4876841cdbb7d7467dec5ae8d3aef5",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/go1.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 90628,
+          "sha256": "e05e2db2be2d34ecffb28b6341743e54de4876841cdbb7d7467dec5ae8d3aef5",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "go2",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/go2",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/go2/go2.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/go2.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 58169,
+          "sha256": "c15649f8af300bb9272a53bfa33e45b72318171e64485c8933559ae16a9bd17d",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/go2-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 209502,
+          "sha256": "2cf7baadd3548d644e6b6791e51b545da97211974d2eb3191f891ba26d3befe4",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/go2.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 209502,
+          "sha256": "2cf7baadd3548d644e6b6791e51b545da97211974d2eb3191f891ba26d3befe4",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "go2w",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/go2w",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/go2w/go2w.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/go2w.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 74786,
+          "sha256": "497451dca2756714451f4833faac08869b0a8f0eea3319b649722c0e08094a0b",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/go2w-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 253007,
+          "sha256": "cfac9b941319671db8e4273584c1d216514224749a1adae93d257f1af0b3c2d4",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/go2w.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 253007,
+          "sha256": "cfac9b941319671db8e4273584c1d216514224749a1adae93d257f1af0b3c2d4",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "as2",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/as2",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/as2/as2.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/as2.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 60076,
+          "sha256": "817d754f7995938fd10d7b58bb8427fa139e0fe68074140184ccfbe90542e99b",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/as2-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 213098,
+          "sha256": "7368cec2d015058ca83f3b4cf9cab2ff44b4f3e3a91f318abc68aa760d22d36d",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/as2.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 213098,
+          "sha256": "7368cec2d015058ca83f3b4cf9cab2ff44b4f3e3a91f318abc68aa760d22d36d",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "a2",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/a2",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/a2/a2.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/a2.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 59942,
+          "sha256": "a1d0a2e91099950c2c7209ed27f33363e2534ac4746c939e7792b3f70f37ac69",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/a2-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 212820,
+          "sha256": "fc3390fe597c2688b9803acf66c61d3d917d25f870210f5601899b83246cf3f2",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/a2.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 212820,
+          "sha256": "fc3390fe597c2688b9803acf66c61d3d917d25f870210f5601899b83246cf3f2",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "aliengo",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 ROS URDF / DAE 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_ros/tree/master/robots/aliengo_description",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_ros/master/robots/aliengo_description/urdf/aliengo.urdf",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_ros/master/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方 URDF 的橙色展示材质；不代表实际交付产品颜色。去除非网格的调试标记。",
+      "outputs": [
+        {
+          "path": "/images/catalog/aliengo.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 52620,
+          "sha256": "28eb9340d34ec34bd021d3a1c64cbf8e41197ffebad437ff2406d04875a15c00",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/aliengo-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 128044,
+          "sha256": "26b034260c594141298f67b2bc844c30bf1d1058736da6fec1e06d705b04b9c1",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/aliengo.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 128044,
+          "sha256": "26b034260c594141298f67b2bc844c30bf1d1058736da6fec1e06d705b04b9c1",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "b1",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 ROS URDF / DAE 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_ros/tree/master/robots/b1_description",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_ros/master/robots/b1_description/xacro/b1.urdf",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_ros/master/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方 URDF 的橙色展示材质；不代表实际交付产品颜色。去除非网格的调试标记。",
+      "outputs": [
+        {
+          "path": "/images/catalog/b1.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 64738,
+          "sha256": "38911f8d99916f9bcc6f1fabaa29849891a73c16153127f09ac12ddd984ee155",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/b1-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 171750,
+          "sha256": "17dd49faee9c5553a5a408a732ce73c070902c2a8cd20214a5b5b3bfbd6876f2",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/b1.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 171750,
+          "sha256": "17dd49faee9c5553a5a408a732ce73c070902c2a8cd20214a5b5b3bfbd6876f2",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "b2",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/b2",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/b2/b2.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/b2.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 52162,
+          "sha256": "9fd90195cb45ea03bdedb169ca06c7fb862d4981bf69c3fec8ac1512ec10ee71",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/b2-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 131267,
+          "sha256": "70ce37a2829892bc572a15e55e4e882e6168a339c25b21b431309ec4920f6fc7",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/b2.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 131267,
+          "sha256": "70ce37a2829892bc572a15e55e4e882e6168a339c25b21b431309ec4920f6fc7",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "family": "b2w",
+      "manufacturer": "Unitree Robotics / 宇树科技",
+      "type": "基于真实厂商 3D 模型的离线渲染，非商品实拍照片",
+      "source_kind": "Unitree 官方 MuJoCo MJCF 模型",
+      "source_page": "https://github.com/unitreerobotics/unitree_mujoco/tree/main/unitree_robots/b2w",
+      "model_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/unitree_robots/b2w/b2w.xml",
+      "license": "BSD-3-Clause",
+      "license_url": "https://raw.githubusercontent.com/unitreerobotics/unitree_mujoco/main/LICENSE",
+      "rights_status": "用于效果预览，正式上线须确认图片授权",
+      "render_method": "MuJoCo EGL 离屏渲染；保留模型几何与原材质；统一展示姿态、光照与相机。透明 PNG 的 alpha 来自同一 3D 场景的 geometry segmentation，不对 JPEG 阈值抠图。",
+      "appearance_note": "保留官方模型的原始材质；实物颜色、纹理与交付配置可能有所不同。",
+      "outputs": [
+        {
+          "path": "/images/catalog/b2w.jpg",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 55636,
+          "sha256": "9098c2c6ae7dcfb1a826918e623604be2013dde6f134b504233af6c0e47d7f1d",
+          "transparent": false
+        },
+        {
+          "path": "/images/catalog/b2w-cutout.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 143357,
+          "sha256": "c20cff6e6e84d9c6abd45f033c8c70751cb928aa206bacc29954dbfbb674c168",
+          "transparent": true
+        },
+        {
+          "path": "/images/catalog/b2w.png",
+          "dimensions": [
+            1200,
+            1000
+          ],
+          "bytes": 143357,
+          "sha256": "c20cff6e6e84d9c6abd45f033c8c70751cb928aa206bacc29954dbfbb674c168",
+          "transparent": true
+        }
+      ]
+    },
+    {
+      "category": "原创生成场景",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/scenes/exploration.jpg",
+          "bytes": 242757,
+          "sha256": "c08d6d2ac08f16e6d4fc243cb2a184997605b881c16357c15a59568dd93e897a"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "原创生成场景",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/scenes/future.jpg",
+          "bytes": 205926,
+          "sha256": "da69654cfb61dd377a858ccdf9e08ca8477f5eef48f288c9883cb5b6b5fa36a5"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "原创生成场景",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/scenes/inspection.jpg",
+          "bytes": 299025,
+          "sha256": "e1bbc5124b0fa376730a5c3d8c253d727e5009a31e8c1aeb5d7d4ab3374af063"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "原创生成场景",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/scenes/research.jpg",
+          "bytes": 229004,
+          "sha256": "9516d32af3d851e489acfe19973a8d42d8cc284f30a55a0e316ce24e513a9735"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "原创生成场景",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/scenes/team.jpg",
+          "bytes": 270717,
+          "sha256": "d2bf38caad17c4c5fb6d9add05527cc9ce7753d909e49157181606eb1bf1e493"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/arm.webp",
+          "bytes": 31266,
+          "sha256": "6e67f677fd8efababef24e48047b58d7579563ab9713fa7f790aeb998fa4a62e"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/battery.webp",
+          "bytes": 23692,
+          "sha256": "8b0ab3f75dcf51e8b984ecee0f9f7d7db590a6044209c489189ba68d5b11b507"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/charger.webp",
+          "bytes": 34350,
+          "sha256": "7566814cc5751bdf9ce7cd8614ebcd24cb5b5aa62f250b1ff8fb45a6ee42f788"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/compute.webp",
+          "bytes": 34954,
+          "sha256": "dea371e3134ac249cace4813b0d2800e14dc94c15826fd83f1b225b3bee1dcd6"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/dock.webp",
+          "bytes": 21436,
+          "sha256": "d72a20d4316781e61e4d3c2f8612f64725e614fd7db39b0a4e57593e613e52b1"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/lidar.webp",
+          "bytes": 15348,
+          "sha256": "731f0c45321a480c764dc894607b6754469f7b796ad09d0d2230068c5c3ef10d"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/motor.webp",
+          "bytes": 32010,
+          "sha256": "993804054093a4225c2996520c7bfb74210889e8eeab531bac2f6e61a19f2e47"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    },
+    {
+      "category": "生成配件展示图",
+      "type": "原创生成概念展示素材，非商品实拍",
+      "source_kind": "image_gen 图像生成；网站用图裁切与尺寸压缩",
+      "outputs": [
+        {
+          "path": "/images/catalog/remote.webp",
+          "bytes": 25310,
+          "sha256": "8b729be541a0c790f2d6f884e4d711368837fcd18aedc2c958a753d914c0c87d"
+        }
+      ],
+      "appearance_note": "用于视觉与布局预览，不代表实际销售产品、服务场所或性能。"
+    }
+  ]
+}

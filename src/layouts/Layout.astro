@@ -1,0 +1,50 @@
+---
+import Icon from '../components/Icon.astro';
+import { products } from '../data/catalog';
+import '../styles/global.css';
+interface Props { title?: string; description?: string; darkHeader?: boolean; schema?: Record<string, unknown> | Record<string, unknown>[]; noindex?: boolean; }
+const { title = 'RobotDog 机器狗商城｜四足机器人与智能配件', description = '探索 RobotDog 精选机器狗、行业四足机器人与智能配件，了解产品配置、参数和应用场景，开启具身智能的更多可能。', darkHeader = false, schema, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, 'https://www.robotdog.com').href;
+const path = Astro.url.pathname;
+const links = [{ href:'/products/',label:'产品系列' },{ href:'/solutions/',label:'应用场景' },{ href:'/journal/',label:'探索与未来' },{ href:'/about/',label:'关于我们' }];
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#1676ff"/><title>{title}</title><meta name="description" content={description}/>
+  <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'}/><link rel="canonical" href={canonical}/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <meta property="og:type" content="website"/><meta property="og:locale" content="zh_CN"/><meta property="og:site_name" content="RobotDog"/><meta property="og:title" content={title}/><meta property="og:description" content={description}/><meta property="og:url" content={canonical}/><meta property="og:image" content="https://www.robotdog.com/images/scenes/future.jpg"/><meta name="twitter:card" content="summary_large_image"/>
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g,'\\u003c')}/>}
+  {darkHeader && <link rel="preload" as="image" href="/images/scenes/future.jpg"/>}
+</head>
+<body>
+  <a href="#main" class="skip-link">跳至主要内容</a>
+  <header class="site-header" id="site-header"><div class="header-inner">
+    <a class="logo" href="/" aria-label="RobotDog 首页"><span class="brand-mark"><i></i><i></i><i></i></span><span>ROBOT<span class="logo-light">DOG</span></span></a>
+    <nav class="desktop-nav" aria-label="主导航">{links.map(link=><a href={link.href} class:list={[{active:path.startsWith(link.href)}]}>{link.label}</a>)}</nav>
+    <div class="header-actions"><a href="/orders/" class="header-cart" aria-label="购物车" id="header-cart"><Icon name="cart" size={23}/><span class="cart-count" id="cart-count" hidden>0</span></a><button class="button button-small button-blue" data-inquiry>咨询选型 <Icon name="diagonal" size={15}/></button><button id="menu-toggle" class="menu-toggle" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav"><Icon name="menu"/></button></div>
+  </div><nav id="mobile-nav" class="mobile-nav" aria-label="移动主导航" hidden>{links.map(link=><a href={link.href}>{link.label}<Icon name="diagonal"/></a>)}<a href="/orders/">我的购物车<Icon name="cart"/></a></nav></header>
+  <main id="main"><slot/></main>
+  <section class="inquiry-band"><div class="container inquiry-band-inner"><div><span class="eyebrow">THE NEXT STEP STARTS HERE</span><h2>让智能，成为你的下一步。</h2><p>从产品到应用，一起找到适合你的机器人方案。</p></div><button class="button button-blue" data-inquiry>聊聊你的需求 <Icon name="diagonal"/></button></div></section>
+  <footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><a class="logo" href="/">ROBOTDOG</a><p>连接机器人与真实世界。</p><span class="footer-domain">WWW.ROBOTDOG.COM</span></div><div class="footer-column"><h3>发现产品</h3><a href="/products/">机器狗与四足机器人</a><a href="/products/#accessories">智能配件与组件</a><a href="/orders/">购物车与订单</a></div><div class="footer-column"><h3>探索更多</h3><a href="/solutions/">应用场景</a><a href="/journal/">探索与未来</a><a href="/about/">关于 RobotDog</a></div><div class="footer-column"><h3>服务与合作</h3><button class="text-button" data-inquiry>产品与方案咨询 <Icon name="diagonal" size={15}/></button><a href="/about/#process">选型与服务流程</a><a href="/privacy/">隐私说明</a></div></div><div class="container footer-bottom"><span>© 2026 RobotDog. All rights reserved.</span><span>效果预览 · 展示价格与配置 · 品牌名称归各自所有者</span><a href="#main">回到顶部 ↑</a></div></footer>
+  <div class="cart-toast" id="cart-toast" role="status" aria-live="polite" hidden><Icon name="check" size={20}/><span id="cart-toast-text"></span><a href="/orders/">查看购物车 →</a></div>
+  <dialog id="inquiry-dialog" class="inquiry-dialog" aria-labelledby="inquiry-title"><div class="dialog-inner"><button class="dialog-close" data-close-dialog aria-label="关闭询价窗口"><Icon name="close"/></button><span class="eyebrow">FIND YOUR NEXT ROBOT</span><h2 id="inquiry-title">从你的需求，开始选型。</h2><p class="dialog-subtitle">整理使用场景，生成一份清晰的产品询价单。</p><form id="inquiry-form"><label>你的称呼<input name="name" autocomplete="name" placeholder="怎么称呼你" required maxlength="80"/></label><label>联系邮箱<input name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="160"/></label><label>感兴趣的产品<select name="product"><option value="尚未确定，想先了解">尚未确定，想先了解</option>{products.map(p=><option value={p.name}>{p.name}</option>)}</select></label><label>使用需求<textarea name="message" rows="3" placeholder="例如：高校机器人课程，需要开放开发接口…" required maxlength="3000"></textarea></label><p class="form-note">信息在本机生成，不会自动发送。<a href="/privacy/">隐私说明</a></p><button type="submit" class="button button-blue">生成询价单 <Icon name="arrow"/></button></form><div id="inquiry-result" hidden><div class="success-mark"><Icon name="check" size={30}/></div><h3>询价单已生成</h3><p>请下载保存，当前尚未发送给销售团队。</p><pre id="inquiry-summary"></pre><div class="result-actions"><button class="button button-blue" id="download-inquiry">下载询价单 <Icon name="download" size={18}/></button><button class="button button-outline" id="edit-inquiry">修改需求</button></div></div></div></dialog>
+  <script>
+    import { addToCart, getCartCount, CART_EVENT, hydrateStorage } from '../lib/cart';
+    import { getProduct } from '../data/catalog';
+    hydrateStorage();
+    const cartCount=document.getElementById('cart-count')!;
+    const updateCart=()=>{const count=getCartCount();cartCount.textContent=String(count);cartCount.hidden=count===0;document.getElementById('header-cart')?.setAttribute('aria-label',`购物车，已选 ${count} 件商品`);};
+    updateCart();window.addEventListener(CART_EVENT,updateCart);window.addEventListener('storage',updateCart);
+    let toastTimer: ReturnType<typeof setTimeout>;
+    document.addEventListener('click',e=>{const target=e.target as Element;const button=target.closest<HTMLElement>('[data-add-to-cart],[data-buy-now]');if(!button)return;e.preventDefault();const slug=button.dataset.addToCart||button.dataset.buyNow;if(!slug||!getProduct(slug))return;const quantityInput=document.querySelector<HTMLInputElement>('[data-product-quantity]');const quantity=quantityInput?Math.min(99,Math.max(1,Number(quantityInput.value)||1)):1;addToCart(slug,quantity);if(button.hasAttribute('data-buy-now')){const link=document.createElement('a');link.href='/orders/';document.body.append(link);link.click();link.remove();return;}document.getElementById('cart-toast-text')!.textContent=`${getProduct(slug)!.name} 已加入购物车`;const toast=document.getElementById('cart-toast')!;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,3200);});
+    const toggle=document.getElementById('menu-toggle');const nav=document.getElementById('mobile-nav');toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')==='true';toggle.setAttribute('aria-expanded',String(!open));toggle.setAttribute('aria-label',open?'打开导航菜单':'关闭导航菜单');if(nav)nav.hidden=open;});
+    const dialog=document.getElementById('inquiry-dialog') as HTMLDialogElement;const form=document.getElementById('inquiry-form') as HTMLFormElement;const result=document.getElementById('inquiry-result')!;let inquiryText='';
+    document.addEventListener('click',e=>{const button=(e.target as Element).closest<HTMLElement>('[data-inquiry]');if(!button)return;form.hidden=false;result.hidden=true;const product=button.dataset.product;if(product){const select=form.elements.namedItem('product') as HTMLSelectElement;if(![...select.options].some(o=>o.value===product))select.add(new Option(product,product));select.value=product;}if(nav)nav.hidden=true;toggle?.setAttribute('aria-expanded','false');dialog.showModal();});
+    document.querySelector('[data-close-dialog]')?.addEventListener('click',()=>dialog.close());dialog?.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+    form?.addEventListener('submit',e=>{e.preventDefault();const d=new FormData(form);inquiryText=['RobotDog 产品询价单','────────────────────',`称呼：${d.get('name')}`,`邮箱：${d.get('email')}`,`产品：${d.get('product')}`,`需求：${d.get('message')}`,'','本询价单为本地生成，尚未发送。'].join('\n');document.getElementById('inquiry-summary')!.textContent=inquiryText;form.hidden=true;result.hidden=false;});
+    document.getElementById('download-inquiry')?.addEventListener('click',()=>{const url=URL.createObjectURL(new Blob(['\uFEFF'+inquiryText],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='RobotDog-询价单.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});document.getElementById('edit-inquiry')?.addEventListener('click',()=>{form.hidden=false;result.hidden=true;});
+  </script>
+</body>
+</html>
