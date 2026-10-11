@@ -13,7 +13,7 @@ curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/deploy/ubuntu-d
 sudo bash robotdog-deploy.sh
 ```
 
-脚本从本仓库下载预构建网站包和 SHA-256 校验文件，通过校验后安装到 `/var/www/robotdogcxy/releases/`，再切换 `current` 链接。Nginx 检查通过后才重载，并请求本机首页确认内容。部署失败会恢复本次修改的入口；旧版本目录保留。首次部署创建 `/etc/nginx/sites-available/robotdogcxy`，后续更新保留 Certbot 增加的 HTTPS 配置。
+脚本从本仓库下载预构建网站包和 SHA-256 校验文件，通过校验后安装到 `/var/www/robotdogcxy/releases/`，再切换 `current` 链接。Nginx 检查通过后才重载，并等待本机首页与本次部署的文件完全一致，最多检查 10 次。重载成功返回时新配置可能仍在切换，脚本会重试，避免将暂时返回的默认欢迎页当成部署失败。部署失败会显示具体阶段、命令和退出码，再恢复本次修改的入口；旧版本目录保留。首次部署创建 `/etc/nginx/sites-available/robotdogcxy`，后续更新保留 Certbot 增加的 HTTPS 配置。
 
 脚本不会删除其他站点或覆盖非本项目配置。若该域名已在其他 Nginx 配置中使用，脚本会显示冲突文件并停止；先检查现有配置，再决定如何调整。不要直接删除其他网站配置。
 

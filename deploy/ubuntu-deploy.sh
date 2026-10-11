@@ -12,7 +12,7 @@ if [[ "$EUID" -ne 0 ]]; then
   echo "请运行：sudo bash robotdog-deploy.sh" >&2
   exit 1
 fi
-for command in curl nginx tar sha256sum systemctl; do
+for command in curl nginx tar sha256sum cmp systemctl; do
   if ! command -v "$command" >/dev/null; then
     echo "缺少 $command。先运行：sudo apt-get install -y nginx curl ca-certificates" >&2
     exit 1
@@ -24,11 +24,13 @@ previous=""
 switched=0
 created_conf=0
 created_enabled=0
+phase="检查已有 Nginx 配置"
 trap 'rm -rf -- "$workdir"' EXIT
 rollback() {
-  local status=$?
+  local status="$1" line="$2" failed_command="$3"
   trap - ERR
   set +e
+  printf '部署失败阶段：%s\n失败命令（行 %s，退出码 %s）：%s\n' "$phase" "$line" "$status" "$failed_command" >&2
   if [[ "$switched" -eq 1 ]]; then
     if [[ -n "$previous" ]]; then
       ln -s "$previous" "$SITE_DIR/.rollback-$$"
@@ -45,7 +47,39 @@ rollback() {
   echo "部署失败，已恢复本次修改的站点入口。请提供上面的报错。" >&2
   exit "$status"
 }
-trap rollback ERR
+trap 'rollback "$?" "$LINENO" "$BASH_COMMAND"' ERR
+
+wait_for_home() {
+  local attempt curl_status=0
+  for attempt in {1..10}; do
+    if curl --fail --silent --show-error --location --connect-timeout 2 --max-time 5 \
+      --noproxy "$DOMAIN" --resolve "$DOMAIN:80:127.0.0.1" --resolve "$DOMAIN:443:127.0.0.1" \
+      --write-out '%{http_code} %{url_effective}\n' "http://$DOMAIN/" \
+      -o "$workdir/home.html" > "$workdir/home-status.txt" 2> "$workdir/home-error.txt"; then
+      curl_status=0
+      if cmp -s "$release/index.html" "$workdir/home.html"; then return 0; fi
+    else
+      curl_status=$?
+    fi
+    if [[ "$attempt" -lt 10 ]]; then
+      echo "等待 Nginx 返回本次部署的首页（$attempt/10）……"
+      sleep 1
+    fi
+  done
+  echo "首页检查失败：等待后仍未返回本次部署的 index.html。" >&2
+  printf '最后一次请求（curl 退出码 %s）：' "$curl_status" >&2
+  cat "$workdir/home-status.txt" >&2
+  if [[ -s "$workdir/home-error.txt" ]]; then cat "$workdir/home-error.txt" >&2; fi
+  if [[ -s "$workdir/home.html" ]]; then
+    printf '实际页面标题：' >&2
+    sed -n 's/.*<title>\([^<]*\)<\/title>.*/\1/p' "$workdir/home.html" | head -c 240 >&2
+    printf '\n实际首页 SHA-256：' >&2
+    sha256sum "$workdir/home.html" >&2
+  fi
+  printf '期望首页 SHA-256：' >&2
+  sha256sum "$release/index.html" >&2
+  return 1
+}
 
 nginx -t
 if [[ -e "$SITE_DIR/current" && ! -L "$SITE_DIR/current" ]]; then
@@ -66,6 +100,7 @@ if [[ -n "$conflicts" ]]; then
   exit 1
 fi
 
+phase="下载并校验部署包"
 fetch() { curl --fail --location --show-error --retry 3 --connect-timeout 15 --max-time 300 "$1" -o "$2"; }
 fetch "$REPOSITORY/deploy/robotdog-site.tar.gz" "$workdir/robotdog-site.tar.gz"
 fetch "$REPOSITORY/deploy/robotdog-site.tar.gz.sha256" "$workdir/robotdog-site.tar.gz.sha256"
@@ -73,6 +108,7 @@ fetch "$REPOSITORY/deploy/robotdog-site.tar.gz.sha256" "$workdir/robotdog-site.t
 fetch "$REPOSITORY/deploy/nginx-http.conf" "$workdir/nginx-http.conf"
 digest="$(sha256sum "$workdir/robotdog-site.tar.gz" | cut -c1-12)"
 release="$SITE_DIR/releases/$(date -u +%Y%m%dT%H%M%SZ)-$digest"
+phase="解压并检查网站文件"
 install -d -m 755 "$SITE_DIR" "$SITE_DIR/releases" "$release"
 tar -xzf "$workdir/robotdog-site.tar.gz" -C "$release" --no-same-owner
 test -s "$release/index.html"
@@ -82,6 +118,7 @@ find "$release" -type d -exec chmod 755 {} +
 find "$release" -type f -exec chmod 644 {} +
 
 # Keep an existing managed configuration, including HTTPS settings added by Certbot.
+phase="安装并检查站点配置"
 if [[ ! -e "$CONF" ]]; then
   install -m 644 "$workdir/nginx-http.conf" "$CONF"
   created_conf=1
@@ -91,16 +128,16 @@ if [[ ! -L "$ENABLED" ]]; then
   created_enabled=1
 fi
 nginx -t
+phase="切换网站版本"
 previous="$(readlink "$SITE_DIR/current" || true)"
 ln -s "$release" "$SITE_DIR/.current-$$"
 mv -Tf "$SITE_DIR/.current-$$" "$SITE_DIR/current"
 switched=1
+phase="启用并重载 Nginx"
 systemctl enable nginx
 if systemctl is-active --quiet nginx; then systemctl reload nginx; else systemctl start nginx; fi
-curl --fail --silent --show-error --location --connect-timeout 5 --max-time 20 \
-  --noproxy "$DOMAIN" --resolve "$DOMAIN:80:127.0.0.1" --resolve "$DOMAIN:443:127.0.0.1" \
-  "http://$DOMAIN/" -o "$workdir/home.html"
-grep -q '不止行走' "$workdir/home.html"
+phase="等待并验证 Nginx 首页"
+wait_for_home
 trap - ERR
 echo "部署成功，Nginx 本机首页检查通过。"
 echo "当前版本：$release"
