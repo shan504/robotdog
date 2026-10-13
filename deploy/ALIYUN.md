@@ -37,17 +37,15 @@ sudo certbot renew --dry-run
 
 ## 后续更新
 
-### Google Search Console 验证文件
+### 已撤销的 Google Search Console 验证文件
 
-用户提供的 `googlecffa0146307cc419.html` 原文件保存在 `public/googlecffa0146307cc419.html`，Astro 构建时会原样复制到网站根目录并包含在部署包中。Google 的验证地址为 `http://robotdogcxy.xyz/googlecffa0146307cc419.html`。验证成功后也应保留该文件，后续更新不要删除。
-
-如果网站已经运行且只需补上此文件，在 Ubuntu 终端执行：
+按用户要求，已移除 `public/googlecffa0146307cc419.html`。当前构建和部署包不再包含此文件。先前执行过单独安装命令的网站，需要在实际 Ubuntu 服务器同步删除正在运行的站点中的文件：
 
 ```bash
-curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/public/googlecffa0146307cc419.html -o /tmp/googlecffa0146307cc419.html && sudo install -m 644 /tmp/googlecffa0146307cc419.html /var/www/robotdogcxy/current/googlecffa0146307cc419.html
+sudo rm -f -- /var/www/robotdogcxy/current/googlecffa0146307cc419.html
 ```
 
-打开验证地址，确认返回 `google-site-verification: googlecffa0146307cc419.html`，再回到 Search Console 点击“验证”。这条命令需在实际服务器执行；提交到 GitHub 不会自动更新已部署的网站。
+移除验证文件可能影响 Search Console 所有权验证。此文件属于 HTML 文件验证方式，不是 DNS TXT 记录；本次项目修改没有更改用户 DNS 配置。现有博客截图不能证明 Google 验证造成注册局 `serverHold`，删除文件也不能保证域名恢复解析。注册局暂停仍需按具体举报依据申请解除。
 
 ### 构建并部署更新
 
