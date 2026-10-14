@@ -1,7 +1,8 @@
 {
-  "site": "https://robotdogcxy.xyz",
+  "site": "https://robotcar.example",
+  "productionDomainConfigured": false,
   "htmlPages": 60,
-  "bytes": 6479306,
-  "sha256": "76f0f363d01a23f3459785c71e8670c8d3dfca1922c5d8729c59007d865d2e6b",
-  "generatedAt": "2026-10-13T06:37:07.978Z"
+  "bytes": 1435844,
+  "sha256": "20efd49015ad35099b9998acd9f560ef578e1309da552261dc9c3411442ebb0e",
+  "generatedAt": "2026-10-14T12:57:12.256Z"
 }

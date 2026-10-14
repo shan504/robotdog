@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-DOMAIN="robotdogcxy.xyz"
+DOMAIN="${1:-}"
+if [[ ! "$DOMAIN" =~ ^[a-z0-9][a-z0-9.-]+\.[a-z]{2,}$ || "$DOMAIN" == *..* || "$DOMAIN" == *.example ]]; then
+  echo "请传入已购买的新域名：sudo bash robotcar-deploy.sh your-real-domain.com" >&2
+  exit 1
+fi
 REPOSITORY="https://raw.githubusercontent.com/shan504/robotdog/main"
-SITE_DIR="/var/www/robotdogcxy"
-CONF="/etc/nginx/sites-available/robotdogcxy"
-ENABLED="/etc/nginx/sites-enabled/robotdogcxy"
-MARKER="# RobotDog managed site: robotdogcxy.xyz"
+SITE_DIR="/var/www/robotcar"
+CONF="/etc/nginx/sites-available/robotcar"
+ENABLED="/etc/nginx/sites-enabled/robotcar"
+MARKER="# RobotCar managed site: $DOMAIN"
 
 if [[ "$EUID" -ne 0 ]]; then
-  echo "请运行：sudo bash robotdog-deploy.sh" >&2
+  echo "请运行：sudo bash robotcar-deploy.sh" >&2
   exit 1
 fi
 for command in curl nginx tar sha256sum cmp systemctl; do
@@ -94,7 +98,8 @@ if [[ -e "$ENABLED" || -L "$ENABLED" ]] && [[ "$(readlink -f "$ENABLED")" != "$C
   echo "$ENABLED 已指向其他配置，未覆盖。" >&2
   exit 1
 fi
-conflicts="$(grep -RlE 'server_name[^;]*[[:space:]]robotdogcxy\.xyz([[:space:];]|$)' /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null | grep -vFx "$ENABLED" || true)"
+domain_pattern="${DOMAIN//./\\.}"
+conflicts="$(grep -RlE "server_name[^;]*[[:space:]]$domain_pattern([[:space:];]|$)" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null | grep -vFx "$ENABLED" || true)"
 if [[ -n "$conflicts" ]]; then
   echo "此域名已有其他 Nginx 站点配置，未替换：$conflicts" >&2
   exit 1
@@ -102,18 +107,19 @@ fi
 
 phase="下载并校验部署包"
 fetch() { curl --fail --location --show-error --retry 3 --connect-timeout 15 --max-time 300 "$1" -o "$2"; }
-fetch "$REPOSITORY/deploy/robotdog-site.tar.gz" "$workdir/robotdog-site.tar.gz"
-fetch "$REPOSITORY/deploy/robotdog-site.tar.gz.sha256" "$workdir/robotdog-site.tar.gz.sha256"
-(cd "$workdir" && sha256sum -c robotdog-site.tar.gz.sha256)
+fetch "$REPOSITORY/deploy/robotcar-site.tar.gz" "$workdir/robotcar-site.tar.gz"
+fetch "$REPOSITORY/deploy/robotcar-site.tar.gz.sha256" "$workdir/robotcar-site.tar.gz.sha256"
+(cd "$workdir" && sha256sum -c robotcar-site.tar.gz.sha256)
 fetch "$REPOSITORY/deploy/nginx-http.conf" "$workdir/nginx-http.conf"
-digest="$(sha256sum "$workdir/robotdog-site.tar.gz" | cut -c1-12)"
+sed -i "s/__ROBOTCAR_DOMAIN__/$DOMAIN/g" "$workdir/nginx-http.conf"
+digest="$(sha256sum "$workdir/robotcar-site.tar.gz" | cut -c1-12)"
 release="$SITE_DIR/releases/$(date -u +%Y%m%dT%H%M%SZ)-$digest"
 phase="解压并检查网站文件"
 install -d -m 755 "$SITE_DIR" "$SITE_DIR/releases" "$release"
-tar -xzf "$workdir/robotdog-site.tar.gz" -C "$release" --no-same-owner
+tar -xzf "$workdir/robotcar-site.tar.gz" -C "$release" --no-same-owner
 test -s "$release/index.html"
-test -s "$release/products/as2-pro/index.html"
-grep -q 'https://robotdogcxy.xyz/' "$release/sitemap.xml"
+test -s "$release/products/rover-pro/index.html"
+grep -Fq "https://$DOMAIN/" "$release/sitemap.xml" || { echo "部署包域名不符。先用 PUBLIC_SITE_URL=https://$DOMAIN 重新构建并推送部署包。" >&2; false; }
 find "$release" -type d -exec chmod 755 {} +
 find "$release" -type f -exec chmod 644 {} +
 

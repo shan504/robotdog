@@ -3,14 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { products } from '../../data/catalog';
 ---
-<Layout title="订单流程演示完成｜RobotDog" description="查看 RobotDog 购物与支付流程的演示结果、订单产品和收货信息。演示不产生真实交易。" noindex>
+<Layout title="订单流程演示完成｜RobotCar" description="查看 RobotCar 购物与支付流程的演示结果、订单产品和收货信息。演示不产生真实交易。" noindex>
   <section class="result-page container">
     <div class="breadcrumb"><a href="/">首页</a><span>/</span><a href="/orders/">购物车</a><span>/</span><span>订单演示结果</span></div>
-    <div id="incomplete-result" class="incomplete-result" hidden><div class="result-symbol"><Icon name="cart" size={36}/></div><h1 id="incomplete-title">还没有订单演示结果。</h1><p id="incomplete-text">从选购机器狗开始，体验完整的购买流程。</p><a href="/products/" id="incomplete-link" class="button button-dark">探索产品 <Icon name="arrow" size={18}/></a></div>
+    <div id="incomplete-result" class="incomplete-result" hidden><div class="result-symbol"><Icon name="cart" size={36}/></div><h1 id="incomplete-title">还没有订单演示结果。</h1><p id="incomplete-text">从选购玩具机器人车开始，体验完整的购买流程。</p><a href="/products/" id="incomplete-link" class="button button-dark">探索产品 <Icon name="arrow" size={18}/></a></div>
     <div id="success-result" hidden>
       <header class="result-banner"><div class="result-check"><Icon name="check" size={38}/></div><span class="eyebrow">READY FOR WHAT’S NEXT</span><h1>每一次探索，都有回响。</h1><p>订单流程演示已完成。</p><span class="result-demo-label">演示结果 · 未发生真实扣款</span><div class="banner-grid"></div></header>
-      <div class="result-body"><div class="result-headline"><div><span class="eyebrow">ORDER SUMMARY</span><h2>你的机器人装备</h2></div><span class="demo-status"><Icon name="check" size={14}/>演示已完成</span></div><dl class="order-metadata"><div><dt>订单编号</dt><dd id="result-order-id"></dd></div><div><dt>创建时间</dt><dd id="result-created"></dd></div><div><dt>演示支付方式</dt><dd id="result-method"></dd></div></dl><div class="result-items">{products.map(product => <a href={`/products/${product.slug}/`} class="result-item" data-result-item={product.slug} hidden><img src={product.image} alt={product.name} width="85" height="85"/><div><h3>{product.name}</h3><span>数量 × <span data-result-quantity={product.slug}>1</span></span></div><strong data-result-price={product.slug}></strong><Icon name="diagonal" size={17}/></a>)}</div><div class="result-total"><span>演示订单总额</span><strong id="result-total">¥0</strong></div><div class="result-shipping"><Icon name="shield" size={22}/><div><span>演示收货信息</span><strong id="result-recipient"></strong><p id="result-address"></p></div></div><div class="demo-explanation"><strong>这是一次完整的购物流程演示</strong><p>本次没有发生真实扣款，不会创建真实交易或安排发货。你可以继续浏览产品，或与我们沟通实际配置与采购需求。</p></div><div class="result-actions"><a href="/products/" class="button button-dark">继续探索产品 <Icon name="arrow" size={18}/></a><button type="button" class="button button-outline" id="download-demo-order">下载演示订单 <Icon name="download" size={17}/></button><button type="button" class="consult-result" data-inquiry>咨询实际采购 <Icon name="diagonal" size={17}/></button></div></div>
-      <div class="next-step-cards"><a href="/solutions/"><span>01 / APPLICATIONS</span><h3>从产品，到真实场景。</h3><p>了解机器狗如何连接巡检、科研与更多应用。</p><Icon name="arrow" size={23}/></a><a href="/journal/"><span>02 / FUTURE</span><h3>下一次突破，已经开始。</h3><p>探索具身智能、自主感知与机器人技术的未来。</p><Icon name="arrow" size={23}/></a></div>
+      <div class="result-body"><div class="result-headline"><div><span class="eyebrow">ORDER SUMMARY</span><h2>你的玩具车套装</h2></div><span class="demo-status"><Icon name="check" size={14}/>演示已完成</span></div><dl class="order-metadata"><div><dt>订单编号</dt><dd id="result-order-id"></dd></div><div><dt>创建时间</dt><dd id="result-created"></dd></div><div><dt>演示支付方式</dt><dd id="result-method"></dd></div></dl><div class="result-items">{products.map(product => <a href={`/products/${product.slug}/`} class="result-item" data-result-item={product.slug} hidden><img src={product.image} alt={product.name} width="85" height="85"/><div><h3>{product.name}</h3><span>数量 × <span data-result-quantity={product.slug}>1</span></span></div><strong data-result-price={product.slug}></strong><Icon name="diagonal" size={17}/></a>)}</div><div class="result-total"><span>演示订单总额</span><strong id="result-total">¥0</strong></div><div class="result-shipping"><Icon name="shield" size={22}/><div><span>演示收货信息</span><strong id="result-recipient"></strong><p id="result-address"></p></div></div><div class="demo-explanation"><strong>这是一次完整的购物流程演示</strong><p>本次没有发生真实扣款，不会创建真实交易或安排发货。你可以继续浏览产品，或与我们沟通实际配置与采购需求。</p></div><div class="result-actions"><a href="/products/" class="button button-dark">继续探索产品 <Icon name="arrow" size={18}/></a><button type="button" class="button button-outline" id="download-demo-order">下载演示订单 <Icon name="download" size={17}/></button><button type="button" class="consult-result" data-inquiry>咨询实际采购 <Icon name="diagonal" size={17}/></button></div></div>
+      <div class="next-step-cards"><a href="/solutions/"><span>01 / APPLICATIONS</span><h3>从产品，到真实场景。</h3><p>了解玩具机器人车如何连接赛道探索、编程教育与更多应用。</p><Icon name="arrow" size={23}/></a><a href="/journal/"><span>02 / FUTURE</span><h3>下一次突破，已经开始。</h3><p>探索车载智能、自主感知与机器人技术的未来。</p><Icon name="arrow" size={23}/></a></div>
     </div>
   </section>
   <script>
@@ -37,14 +37,14 @@ import { products } from '../../data/catalog';
       document.querySelectorAll<HTMLElement>('[data-result-item]').forEach(row => { const item = order.items.find(item => item.slug === row.dataset.resultItem); row.hidden = !item; if (item) { row.querySelector('[data-result-quantity]')!.textContent = String(item.quantity); row.querySelector('[data-result-price]')!.textContent = formatPrice(item.priceCNY * item.quantity); } });
       document.getElementById('download-demo-order')?.addEventListener('click', () => {
         const text = [
-          'RobotDog 演示订单', '────────────────────', '本文件为购物流程演示结果，不构成真实成交或支付凭证。', '',
+          'RobotCar 演示订单', '────────────────────', '本文件为购物流程演示结果，不构成真实成交或支付凭证。', '',
           `订单编号：${order.id}`, `创建时间：${document.getElementById('result-created')!.textContent}`, `演示支付方式：${order.method === 'alipay' ? '支付宝' : '微信支付'}`, '', '产品清单：',
           ...order.items.map(item => `${item.name} × ${item.quantity} | 单价 ${formatPrice(item.priceCNY)} | 小计 ${formatPrice(item.priceCNY * item.quantity)}`), '',
           `演示总额：${formatPrice(getOrderTotal(order))}`, `收货人：${order.recipient}`, `联系电话：${order.phone}`, `收货地址：${order.region} ${order.address}`,
           order.invoice ? `发票信息：${order.invoice}` : '', order.note ? `订单备注：${order.note}` : '', '', '未发生真实扣款，不会安排发货。',
         ].filter(Boolean).join('\n');
         const url = URL.createObjectURL(new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8' }));
-        const link = document.createElement('a'); link.href = url; link.download = `RobotDog-${order.id}-演示订单.txt`; link.click();
+        const link = document.createElement('a'); link.href = url; link.download = `RobotCar-${order.id}-演示订单.txt`; link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       });
     }

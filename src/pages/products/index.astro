@@ -2,39 +2,39 @@
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import Icon from '../../components/Icon.astro';
-import { products, robotProducts, accessoryProducts, families } from '../../data/catalog';
+import { products, carProducts, accessoryProducts, families } from '../../data/catalog';
 const groups = [
-  { id: 'consumer', name: '机器狗 · 消费级 / 科研', english: 'CONSUMER & RESEARCH' },
-  { id: 'industry', name: '机器狗 · 行业级', english: 'INDUSTRIAL ROBOTICS' },
+  { id: 'consumer', name: '玩具车 · 遥控与竞速', english: 'REMOTE CONTROL & PLAY' },
+  { id: 'industry', name: '玩具车 · 编程与创造', english: 'STEM & CREATIVE PLAY' },
   { id: 'accessory', name: '配件与扩展', english: 'ACCESSORIES & MODULES' },
 ];
-const familyData = families.map(family => ({ ...family, related: [...new Set(robotProducts.filter(product => product.family === family.slug).flatMap(product => product.relatedAccessories))] }));
+const familyData = families.map(family => ({ ...family, related: [...new Set(carProducts.filter(product => product.family === family.slug).flatMap(product => product.relatedAccessories))] }));
 ---
-<Layout title="机器狗商城｜四足机器人、科研平台与机器人配件 · RobotDog" description="探索 RobotDog 机器狗商城，按消费科研、行业巡检和机器人配件分类浏览产品，了解展示价格、配置与详细参数，组合适合自己的四足机器人。">
+<Layout title="玩具机器人车商城｜智能玩具车、编程教育平台与机器人配件 · RobotCar" description="探索 RobotCar 玩具机器人车商城，按遥控竞速、编程教育和玩具车配件分类浏览产品，了解展示价格、配置与详细参数，组合适合自己的智能玩具车。">
   <section class="catalog-intro container">
     <nav class="catalog-breadcrumb" aria-label="面包屑导航"><a href="/">首页</a><span>/</span><span>产品系列</span></nav>
-    <div class="catalog-intro-row"><div><span class="eyebrow">ROBOTICS FOR EVERY POSSIBILITY</span><h1>发现你的下一台机器狗。</h1><p>从一份好奇，到无限可能。机器人、配件与完整应用配置，一目了然。</p></div><a href="/orders/" class="catalog-order-link"><Icon name="cart" size={19}/>我的购物车 <Icon name="arrow" size={17}/></a></div>
+    <div class="catalog-intro-row"><div><span class="eyebrow">ROBOTICS FOR EVERY POSSIBILITY</span><h1>发现你的下一辆玩具机器人车。</h1><p>从一份好奇，到无限可能。车类、配件与玩法套装，一目了然。</p></div><a href="/orders/" class="catalog-order-link"><Icon name="cart" size={19}/>我的购物车 <Icon name="arrow" size={17}/></a></div>
     <p class="catalog-demo-note">产品展示版本：价格与配置用于选型预览，正式报价及供货信息以确认订单为准。</p>
   </section>
-  <section class="catalog-layout container" aria-label="机器狗产品商城">
-    <aside class="catalog-sidebar" aria-label="按机器狗系列分类">
-      <button class="family-button family-all selected" data-family-filter="all" aria-pressed="true"><span class="all-grid"><i></i><i></i><i></i><i></i></span><span>全部机器狗<small>{robotProducts.length} 款产品</small></span></button>
-      {groups.map(group => <div class="family-group"><h2>{group.name}</h2>{families.filter(family => family.group === group.id).map(family => <button class="family-button" data-family-filter={family.slug} aria-pressed="false"><img src={family.image.replace(/\.jpg$/, '-cutout.png')} alt="" width="70" height="58" loading="lazy"/><span>{family.name}</span><Icon name="chevron" size={13}/></button>)}</div>)}
+  <section class="catalog-layout container" aria-label="玩具机器人车产品商城">
+    <aside class="catalog-sidebar" aria-label="按玩具机器人车系列分类">
+      <button class="family-button family-all selected" data-family-filter="all" aria-pressed="true"><span class="all-grid"><i></i><i></i><i></i><i></i></span><span>全部玩具机器人车<small>{carProducts.length} 款产品</small></span></button>
+      {groups.map(group => <div class="family-group"><h2>{group.name}</h2>{families.filter(family => family.group === group.id).map(family => <button class="family-button" data-family-filter={family.slug} aria-pressed="false"><img src={family.image} alt="" width="70" height="58" loading="lazy"/><span>{family.name}</span><Icon name="chevron" size={13}/></button>)}</div>)}
       <a href="/solutions/" class="sidebar-help"><span>让能力匹配任务。</span><strong>探索应用场景 <Icon name="diagonal" size={15}/></strong></a>
     </aside>
     <div class="catalog-main">
-      <div class="catalog-toolbar"><div><span class="catalog-current-eyebrow" id="current-eyebrow">ALL QUADRUPED ROBOTS</span><h2 id="current-family">全部机器狗 <span id="product-count">{robotProducts.length}</span></h2></div><label class="catalog-search"><Icon name="search" size={18}/><input id="product-search" type="search" aria-label="搜索产品型号或用途" placeholder="搜索型号 / 配置"/></label></div>
-      <p class="catalog-family-description" id="family-description">灵巧的消费级伙伴、开放的科研平台、可靠的行业设备。在这里，找到你的下一步。</p>
+      <div class="catalog-toolbar"><div><span class="catalog-current-eyebrow" id="current-eyebrow">ALL ROBOTIC TOY CARS</span><h2 id="current-family">全部玩具机器人车 <span id="product-count">{carProducts.length}</span></h2></div><label class="catalog-search"><Icon name="search" size={18}/><input id="product-search" type="search" aria-label="搜索产品型号或用途" placeholder="搜索型号 / 配置"/></label></div>
+      <p class="catalog-family-description" id="family-description">遥控竞速、全向移动、创客拼装与视觉探索。在这里，找到适合你的玩具车套装。</p>
       <div class="catalog-grid-layout" id="catalog-grid-layout">
         <div class="catalog-products" id="product-list">{products.map(product => <div class="catalog-item" data-listing-item data-family={product.family} data-kind={product.kind} data-slug={product.slug} data-search={`${product.name} ${product.category} ${product.shortDescription}`.toLowerCase()} hidden={product.kind === 'accessory'}><ProductCard product={product}/></div>)}</div>
         <aside class="catalog-accessories" id="accessory-rail" aria-label="配套机器人配件"><div class="accessory-rail-heading"><h3>拓展更多能力</h3><span>ACCESSORIES</span></div><div class="accessory-rail-grid">{accessoryProducts.map((product,index) => <div data-rail-item data-slug={product.slug} hidden={index >= 6}><ProductCard product={product} compact/></div>)}</div><button class="all-accessories" id="view-accessories">查看全部配件 <Icon name="arrow" size={17}/></button></aside>
       </div>
-      <div class="catalog-empty" id="catalog-empty" hidden><Icon name="search" size={30}/><h3>暂未找到匹配的产品</h3><p>换一个型号或用途试试，也可以咨询我们帮助选型。</p><button class="button button-blue" id="reset-search">查看全部机器狗</button></div>
-      <div class="catalog-bottom"><span id="catalog-bottom-count">已展示 {robotProducts.length} 款机器狗</span><a href="/journal/how-to-choose-a-robot-dog/">阅读选型指南 <Icon name="diagonal" size={15}/></a></div>
+      <div class="catalog-empty" id="catalog-empty" hidden><Icon name="search" size={30}/><h3>暂未找到匹配的产品</h3><p>换一个型号或用途试试，也可以咨询我们帮助选型。</p><button class="button button-blue" id="reset-search">查看全部玩具机器人车</button></div>
+      <div class="catalog-bottom"><span id="catalog-bottom-count">已展示 {carProducts.length} 款玩具机器人车</span><a href="/journal/how-to-choose-a-robot-car/">阅读选型指南 <Icon name="diagonal" size={15}/></a></div>
     </div>
   </section>
-  <section class="catalog-selection"><div class="container"><span class="eyebrow">THE RIGHT ROBOT. THE RIGHT MISSION.</span><div class="selection-heading"><h2>选择之前，先看见可能。</h2><a href="/solutions/" class="text-link">了解应用方案 <Icon name="arrow"/></a></div><div class="selection-directions"><a href="/solutions/education/"><span>01 / 科研与教育</span><h3>让算法拥有真实的身体。</h3><p>运动控制、感知融合与自主导航，连接从课堂到实验室的每一步。</p><Icon name="diagonal"/></a><a href="/solutions/inspection/"><span>02 / 行业与巡检</span><h3>把可靠，带到更远的现场。</h3><p>从路线、传感器到任务载荷，让机器人为真实工作创造价值。</p><Icon name="diagonal"/></a><a href="/solutions/exhibition/"><span>03 / 体验与互动</span><h3>未来，触手可及。</h3><p>让科技活动、互动体验与创意展示，多一个令人惊喜的主角。</p><Icon name="diagonal"/></a></div></div></section>
-  <script define:vars={{ familyData, robotCount: robotProducts.length }}>
+  <section class="catalog-selection"><div class="container"><span class="eyebrow">THE RIGHT ROBOT. THE RIGHT MISSION.</span><div class="selection-heading"><h2>选择之前，先看见可能。</h2><a href="/solutions/" class="text-link">了解应用方案 <Icon name="arrow"/></a></div><div class="selection-directions"><a href="/solutions/education/"><span>01 / STEM 与编程</span><h3>让第一行代码，带着小车出发。</h3><p>运动控制、感知融合与自主导航，连接从课堂到实验室的每一步。</p><Icon name="diagonal"/></a><a href="/solutions/racing/"><span>02 / 遥控与竞速</span><h3>把欢乐，带到每一道弯。</h3><p>从转向、轮胎到迷你围栏，让小小赛道充满惊喜。</p><Icon name="diagonal"/></a><a href="/solutions/exhibition/"><span>03 / 体验与互动</span><h3>未来，触手可及。</h3><p>让科技活动、互动体验与创意展示，多一个令人惊喜的主角。</p><Icon name="diagonal"/></a></div></div></section>
+  <script define:vars={{ familyData, carCount: carProducts.length }}>
     (() => {
       const filters = [...document.querySelectorAll('[data-family-filter]')];
       const items = [...document.querySelectorAll('[data-listing-item]')];
@@ -49,38 +49,38 @@ const familyData = families.map(family => ({ ...family, related: [...new Set(rob
         const query = search.value.trim().toLowerCase();
         let count = 0;
         items.forEach(item => {
-          const familyMatch = active === 'all' ? item.dataset.kind === 'robot' : active === 'accessories' ? item.dataset.kind === 'accessory' : item.dataset.family === active;
+          const familyMatch = active === 'all' ? item.dataset.kind === 'car' : active === 'accessories' ? item.dataset.kind === 'accessory' : item.dataset.family === active;
           const match = familyMatch && (!query || item.dataset.search.includes(query));
           item.hidden = !match;
           if (match) count++;
         });
         filters.forEach(button => { const selected = button.dataset.familyFilter === active; button.classList.toggle('selected', selected); button.setAttribute('aria-pressed', String(selected)); });
-        const name = active === 'all' ? '全部机器狗' : active === 'accessories' ? '全部配件' : family?.name || '产品系列';
+        const name = active === 'all' ? '全部玩具机器人车' : active === 'accessories' ? '全部配件' : family?.name || '产品系列';
         const heading = document.getElementById('current-family');
         heading.firstChild.textContent = name + ' ';
         document.getElementById('product-count').textContent = String(count);
-        document.getElementById('current-eyebrow').textContent = active === 'all' ? 'ALL QUADRUPED ROBOTS' : isAccessory ? 'ACCESSORIES & EXPANSION' : family?.group === 'industry' ? 'INDUSTRIAL QUADRUPED ROBOTS' : 'CONSUMER & RESEARCH';
-        document.getElementById('family-description').textContent = family?.description || (isAccessory ? '从智能电池、关节模组到感知设备，组合你的完整机器人方案。' : '灵巧的消费级伙伴、开放的科研平台、可靠的行业设备。在这里，找到你的下一步。');
+        document.getElementById('current-eyebrow').textContent = active === 'all' ? 'ALL ROBOTIC TOY CARS' : isAccessory ? 'ACCESSORIES & EXPANSION' : family?.group === 'industry' ? 'STEM & CREATIVE PLAY' : 'REMOTE CONTROL & PLAY';
+        document.getElementById('family-description').textContent = family?.description || (isAccessory ? '从备用电池、驱动电机到教学传感器，组合你的玩具车玩法。' : '遥控竞速、全向移动、创客拼装与视觉探索。在这里，找到适合你的玩具车套装。');
         const related = family?.related || [];
         railItems.forEach((item,index) => item.hidden = active === 'all' ? index >= 6 : !related.includes(item.dataset.slug));
         const showRail = !isAccessory && !query && railItems.some(item => !item.hidden);
         rail.hidden = !showRail;
         layout.classList.toggle('without-rail', !showRail);
         document.getElementById('catalog-empty').hidden = count !== 0;
-        document.getElementById('catalog-bottom-count').textContent = `已展示 ${count} 款${isAccessory ? '配件' : '机器狗'}`;
+        document.getElementById('catalog-bottom-count').textContent = `已展示 ${count} 款${isAccessory ? '配件' : '玩具机器人车'}`;
       };
       const selectFamily = value => {
         active = value; search.value = ''; render();
-        const params = new URLSearchParams(window.__robotdogPreviewSearch ?? window.location.search);
+        const params = new URLSearchParams(window.__robotcarPreviewSearch ?? window.location.search);
         if (value === 'all') params.delete('family'); else params.set('family', value);
-        if (window.__robotdogPreviewSearch !== undefined) window.__robotdogPreviewSearch = params.toString() ? '?' + params.toString() : '';
+        if (window.__robotcarPreviewSearch !== undefined) window.__robotcarPreviewSearch = params.toString() ? '?' + params.toString() : '';
         else { const url = new URL(location.href); url.search = params.toString(); history.replaceState({}, '', url); }
       };
       filters.forEach(button => button.addEventListener('click', () => selectFamily(button.dataset.familyFilter)));
       search.addEventListener('input', render);
       document.getElementById('view-accessories').addEventListener('click', () => { selectFamily('accessories'); document.querySelector('.catalog-toolbar').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       document.getElementById('reset-search').addEventListener('click', () => selectFamily('all'));
-      const initial = (window.__robotdogPreviewHash ?? location.hash) === '#accessories' ? 'accessories' : new URLSearchParams(window.__robotdogPreviewSearch ?? window.location.search).get('family');
+      const initial = (window.__robotcarPreviewHash ?? location.hash) === '#accessories' ? 'accessories' : new URLSearchParams(window.__robotcarPreviewSearch ?? window.location.search).get('family');
       if(initial && (initial === 'accessories' || familyData.some(f => f.slug === initial))) active = initial;
       render();
     })();

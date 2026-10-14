@@ -1,17 +1,17 @@
 import { products } from '../data/catalog';
 
 export type CartItem = { slug: string; quantity: number };
-export const CART_EVENT = 'robotdog:cart-updated';
-export const CART_KEY = 'robotdog.cart.v2';
-export const SELECTION_KEY = 'robotdog.selection.v2';
-export const CHECKOUT_KEY = 'robotdog.checkout.v2';
-export const ORDER_KEY = 'robotdog.order.v2';
+export const CART_EVENT = 'robotcar:cart-updated';
+export const CART_KEY = 'robotcar.cart.v2';
+export const SELECTION_KEY = 'robotcar.selection.v2';
+export const CHECKOUT_KEY = 'robotcar.checkout.v2';
+export const ORDER_KEY = 'robotcar.order.v2';
 type StorageLike = { getItem: (key: string) => string | null; setItem: (key: string, value: string) => void; removeItem: (key: string) => void };
-type PreviewWindow = Window & { __robotdogPreviewStorage?: StorageLike; __robotdogPreviewNavigate?: (path: string, replace?: boolean) => void; __robotdogMemory?: Record<string, string>; __robotdogCartHydrated?: boolean; __robotdogStorageFallback?: boolean };
+type PreviewWindow = Window & { __robotcarPreviewStorage?: StorageLike; __robotcarPreviewNavigate?: (path: string, replace?: boolean) => void; __robotcarMemory?: Record<string, string>; __robotcarCartHydrated?: boolean; __robotcarStorageFallback?: boolean };
 
 export function navigateTo(path: string, replace = false): void {
   if (typeof window === 'undefined' || !path.startsWith('/') || path.startsWith('//')) return;
-  const bridge = (window as PreviewWindow).__robotdogPreviewNavigate;
+  const bridge = (window as PreviewWindow).__robotcarPreviewNavigate;
   if (typeof bridge === 'function') { bridge(path, replace); return; }
   if (replace) window.location.replace(path);
   else window.location.href = path;
@@ -21,7 +21,7 @@ function previewStorage(): StorageLike | null {
   if (typeof window === 'undefined') return null;
   const own = window as PreviewWindow;
   try {
-    const bridge = own.__robotdogPreviewStorage || (window.parent as PreviewWindow).__robotdogPreviewStorage;
+    const bridge = own.__robotcarPreviewStorage || (window.parent as PreviewWindow).__robotcarPreviewStorage;
     if (bridge) return bridge;
   } catch { /* A cross-origin parent is optional. */ }
   return null;
@@ -32,8 +32,8 @@ function fallbackStorage(): StorageLike {
   const own = window as PreviewWindow;
   const bridge = previewStorage();
   if (bridge) return bridge;
-  own.__robotdogMemory ||= {};
-  const memory = own.__robotdogMemory;
+  own.__robotcarMemory ||= {};
+  const memory = own.__robotcarMemory;
   return { getItem: key => memory[key] ?? null, setItem: (key, value) => { memory[key] = value; }, removeItem: key => { delete memory[key]; } };
 }
 
@@ -42,8 +42,8 @@ export function readStored<T = unknown>(key: string): T | null {
   const own = window as PreviewWindow;
   let raw: string | null = null;
   const preview = previewStorage();
-  try { raw = preview ? preview.getItem(key) : own.__robotdogStorageFallback ? fallbackStorage().getItem(key) : window.localStorage.getItem(key); }
-  catch { own.__robotdogStorageFallback = true; raw = fallbackStorage().getItem(key); }
+  try { raw = preview ? preview.getItem(key) : own.__robotcarStorageFallback ? fallbackStorage().getItem(key) : window.localStorage.getItem(key); }
+  catch { own.__robotcarStorageFallback = true; raw = fallbackStorage().getItem(key); }
   // A quota error may have switched a previous document to the preview bridge.
   if (!raw) raw = fallbackStorage().getItem(key);
   if (!raw) return null;
@@ -56,14 +56,14 @@ export function writeStored(key: string, value: unknown): void {
   const own = window as PreviewWindow;
   const preview = previewStorage();
   if (preview) { preview.setItem(key, raw); return; }
-  if (own.__robotdogStorageFallback) { fallbackStorage().setItem(key, raw); return; }
+  if (own.__robotcarStorageFallback) { fallbackStorage().setItem(key, raw); return; }
   try { window.localStorage.setItem(key, raw); }
-  catch { own.__robotdogStorageFallback = true; fallbackStorage().setItem(key, raw); }
+  catch { own.__robotcarStorageFallback = true; fallbackStorage().setItem(key, raw); }
 }
 
 export function removeStored(key: string): void {
   if (typeof window === 'undefined') return;
-  try { window.localStorage.removeItem(key); } catch { (window as PreviewWindow).__robotdogStorageFallback = true; }
+  try { window.localStorage.removeItem(key); } catch { (window as PreviewWindow).__robotcarStorageFallback = true; }
   fallbackStorage().removeItem(key);
 }
 
@@ -117,8 +117,8 @@ export function getSelectedCart(): CartItem[] {
 export function hydrateStorage(): void {
   if (typeof window === 'undefined') return;
   const own = window as PreviewWindow;
-  if (!own.__robotdogCartHydrated) {
-    own.__robotdogCartHydrated = true;
+  if (!own.__robotcarCartHydrated) {
+    own.__robotcarCartHydrated = true;
     window.addEventListener('storage', event => { if (event.key === CART_KEY || event.key === SELECTION_KEY || event.key === null) window.dispatchEvent(new CustomEvent(CART_EVENT)); });
     window.addEventListener('pageshow', () => window.dispatchEvent(new CustomEvent(CART_EVENT)));
   }
@@ -130,7 +130,7 @@ export type DemoOrder = { id: string; createdAt: string; status: 'awaiting_demo_
 
 export function getDemoOrder(): DemoOrder | null {
   const raw = readStored<DemoOrder>(ORDER_KEY);
-  if (!raw || typeof raw.id !== 'string' || !/^RD[0-9A-Z-]{10,45}$/.test(raw.id) || !Array.isArray(raw.items)) return null;
+  if (!raw || typeof raw.id !== 'string' || !/^RC[0-9A-Z-]{10,45}$/.test(raw.id) || !Array.isArray(raw.items)) return null;
   const items = raw.items.filter(item => item && knownSlug(item.slug) && typeof item.quantity === 'number' && Number.isFinite(item.quantity) && item.quantity >= 1).map(item => {
     const product = products.find(product => product.slug === item.slug)!;
     return { slug: product.slug, name: product.name, priceCNY: product.priceCNY, quantity: quantityFor(item.quantity) };

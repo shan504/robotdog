@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><title>RobotCar original product rendering studio</title><style>html,body{margin:0;background:transparent}canvas{display:block;width:1000px;height:850px}</style><script type="importmap">{"imports":{"three":"/three/build/three.module.js"}}</script></head><body><script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from '/three/examples/jsm/geometries/RoundedBoxGeometry.js';
+const id=new URLSearchParams(location.search).get('model')||'omni';
+const scene=new THREE.Scene();
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(1000,850);renderer.setPixelRatio(1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;document.body.append(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(32,1000/850,0.1,100);camera.position.set(5.6,4.0,5.6);camera.lookAt(0,0.75,0);
+scene.add(new THREE.HemisphereLight(0xffffff,0xa1adc1,2.5));
+for(const [x,y,z,power] of [[-4,7,4,4],[5,5,-3,3]]){const light=new THREE.DirectionalLight(0xffffff,power);light.position.set(x,y,z);light.castShadow=true;light.shadow.mapSize.set(2048,2048);light.shadow.camera.left=-6;light.shadow.camera.right=6;light.shadow.camera.top=6;light.shadow.camera.bottom=-6;light.shadow.normalBias=.025;scene.add(light);}
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.ShadowMaterial({opacity:.17}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const root=new THREE.Group();scene.add(root);
+const material=(color,metal=.25,rough=.35)=>new THREE.MeshStandardMaterial({color,metalness:metal,roughness:rough});
+const black=material(0x111927,.2,.6),rubber=material(0x151922,0,.8),silver=material(0xced7e0,.7,.3),glass=material(0x172c45,.45,.16),white=material(0xeff3fa,.15,.3),blue=material(0x1875ed,.5,.24),orange=material(0xf28a29,.3,.25),green=material(0x2b8870,.3,.45);
+const led=new THREE.MeshStandardMaterial({color:0x79ebff,emissive:0x3bbddf,emissiveIntensity:.8});
+function mesh(geo,mat,x=0,y=0,z=0,parent=root){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function box(w,h,d,mat,x=0,y=0,z=0,r=.1,parent=root){return mesh(new RoundedBoxGeometry(w,h,d,4,r),mat,x,y,z,parent);}
+function cyl(radius,length,mat,x,y,z,parent=root){return mesh(new THREE.CylinderGeometry(radius,radius,length,32),mat,x,y,z,parent);}
+function bar(a,b,r,mat){const start=new THREE.Vector3(...a),end=new THREE.Vector3(...b),dir=end.clone().sub(start);const m=mesh(new THREE.CylinderGeometry(r,r,dir.length(),16),mat);m.position.copy(start.add(end).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());return m;}
+function wheel(x,z,r=.48,mecanum=false){const g=new THREE.Group();g.position.set(x,r,z);root.add(g);const tire=cyl(r,.34,rubber,0,0,0,g);tire.rotation.x=Math.PI/2;const rim=cyl(r*.63,.36,silver,0,0,0,g);rim.rotation.x=Math.PI/2;const inset=cyl(r*.44,.38,black,0,0,0,g);inset.rotation.x=Math.PI/2;const hub=cyl(r*.2,.41,blue,0,0,0,g);hub.rotation.x=Math.PI/2;
+for(let i=0;i<16;i++){const a=i*Math.PI/8;const tread=box(.095,.045,.35,rubber,Math.cos(a)*(r-.012),Math.sin(a)*(r-.012),0,.01,g);tread.rotation.z=a-Math.PI/2;}
+for(let i=0;i<6;i++){const a=i*Math.PI/3;const spoke=box(r*.83,.055,.03,silver,0,0,.21,.01,g);spoke.rotation.z=a;}
+if(mecanum){for(let i=0;i<10;i++){const a=i*Math.PI/5;const roll=cyl(.075,.31,silver,Math.cos(a)*r*.84,Math.sin(a)*r*.84,0,g);roll.rotation.set(Math.PI/4,0,a);}}
+}
+function cam(x,y,z){box(.44,.3,.43,black,x,y,z);const lens=cyl(.105,.05,glass,x+.24,y,z);lens.rotation.z=Math.PI/2;}
+function pcb(x,y,z,w=1.4,d=.9){box(w,.09,d,green,x,y,z,.025);for(let i=0;i<4;i++)box(.23,.05,.12,black,x-.42+i*.25,y+.075,z+.15,.015);box(.5,.06,.32,silver,x+.1,y+.09,z-.15,.025);for(let i=0;i<8;i++){box(.03,.03,.07,silver,x-w*.45+i*w*.12,y+.065,z+d*.44,.005);}}
+const colors={sprint:blue,omni:white,rover:orange,drift:material(0x6555ca,.4,.25),maker:blue,vision:material(0x26a9ac,.35,.25),circuit:material(0xf04844,.4,.25),cargo:material(0xf2bd37,.4,.3),transform:silver};
+if(colors[id]){
+const color=colors[id],r=id==='rover'?.58:id==='circuit'?.4:.47;
+for(const x of [-1.12,1.05])for(const z of [-.83,.83])wheel(x,z,r,id==='omni');
+box(3.12,.22,1.55,black,0,r+.02,0,.12);box(2.85,.5,1.42,color,-.03,r+.34,0,.18);
+box(.08,.13,1.12,led,1.43,r+.43,0,.03);box(.07,.12,.3,material(0xed3543),-1.47,r+.34,-.46,.025);box(.07,.12,.3,material(0xed3543),-1.47,r+.34,.46,.025);
+if(['sprint','drift','circuit'].includes(id)){const canopy=box(1.38,.47,1.14,glass,-.22,r+.79,0,.16);canopy.rotation.z=-.06;box(1.5,.12,1.16,color,-.34,r+1.01,0,.08);box(.12,.16,1.43,black,-1.4,r+.63,0,.03);}
+if(id==='drift'||id==='circuit'){box(.55,.08,1.95,color,-1.4,r+.9,0,.025);bar([-1.36,r+.62,-.45],[-1.36,r+.9,-.45],.03,silver);bar([-1.36,r+.62,.45],[-1.36,r+.9,.45],.03,silver);}
+if(id==='circuit'){box(.42,.1,2.02,color,1.48,r+.15,0,.04);box(1.5,.13,.22,white,.4,r+.61,-.48,.05);box(1.5,.13,.22,white,.4,r+.61,.48,.05);}
+if(id==='rover'){box(1.6,.4,1.15,black,-.17,r+.7,0,.12);for(const z of [-.6,.6]){bar([-.9,r+.55,z],[-.7,r+1.16,z],.045,silver);bar([-.7,r+1.16,z],[.55,r+1.16,z],.045,silver);bar([.55,r+1.16,z],[.8,r+.55,z],.045,silver);}bar([-.7,r+1.16,-.6],[-.7,r+1.16,.6],.045,silver);bar([.55,r+1.16,-.6],[.55,r+1.16,.6],.045,silver);box(.18,.23,1.75,black,1.6,r+.32,0,.04);for(const z of [-.87,.87])for(const x of [-1.1,1.04]){bar([x-.18,r*.75,z],[x+.14,r+.38,z],.05,silver);}}
+if(id==='omni'||id==='vision'){box(1.6,.32,1.18,color,-.3,r+.7,0,.14);cam(.72,r+.94,0);box(.12,.03,.8,led,-.45,r+.89,0,.025);}
+if(id==='maker'){root.children.filter(m=>m.isMesh&&m.material===color).forEach(m=>m.visible=false);pcb(0,r+.26,0,2.2,1.25);box(.85,.35,.48,blue,-.3,r+.5,.25,.08);cam(.8,r+.6,0);for(let i=0;i<3;i++)bar([-.75+i*.16,r+.63,.1],[-.25+i*.16,r+.35,-.42],.015,orange);}
+if(id==='cargo'){box(1.2,.6,1.28,color,.65,r+.77,0,.12);box(.12,.37,1.05,glass,1.28,r+.81,0,.07);box(1.63,.13,1.45,black,-.77,r+.65,0,.03);for(const z of [-.72,.72])box(1.63,.33,.12,color,-.77,r+.81,z,.03);box(.12,.33,1.45,color,-1.58,r+.81,0,.03);for(let i=0;i<3;i++)box(.47,.35,.48,[blue,orange,white][i],-1.21+i*.5,r+.89,0,.045);}
+if(id==='transform'){box(1.06,.3,1.18,orange,.75,r+.72,0,.12);box(1.06,.3,1.18,blue,-.75,r+.72,0,.12);box(.45,.3,1.15,black,0,r+.58,0,.07);cam(.92,r+.94,0);for(const z of [-.63,.63])bar([-.35,r+.73,z],[.35,r+.73,z],.04,silver);}
+}else{
+camera.position.set(4,3.1,4.5);camera.lookAt(0,.45,0);
+if(id==='smart-battery'){box(2.1,.7,1.15,black,0,.42,0,.14);box(1.7,.03,.92,blue,0,.79,0,.015);for(const z of [-.3,.3])bar([1,.69,z],[1.43,.73,z],.045,z<0?orange:black);box(.36,.15,.7,black,1.5,.73,0,.03);}
+if(id==='drive-motor'){const c=cyl(.52,1.2,silver,0,.57,0);c.rotation.z=Math.PI/2;box(.8,.63,.83,black,.55,.55,0,.08);const shaft=cyl(.12,.7,silver,1.15,.56,0);shaft.rotation.z=Math.PI/2;box(.12,.22,.5,orange,-.7,.57,0,.025);}
+if(id==='sensor-pack'){pcb(0,.16,0,2,1.2);for(const z of [-.32,.32]){const drum=cyl(.25,.36,silver,.55,.46,z);drum.rotation.z=Math.PI/2;const lens=cyl(.17,.38,glass,.57,.46,z);lens.rotation.z=Math.PI/2;}box(.72,.2,.3,black,-.52,.32,.25,.04);}
+if(id==='remote-controller'){box(2.55,.45,1.85,black,0,.45,0,.3);box(.7,.03,.37,glass,0,.69,-.37,.03);for(const x of [-.73,.73]){cyl(.28,.12,silver,x,.72,.13);cyl(.12,.15,black,x,.83,.13);}for(let i=0;i<3;i++)cyl(.075,.04,[blue,orange,white][i],-.28+i*.28,.71,.63);bar([0,.6,-.85],[0,1.35,-1.04],.035,black);}
+if(id==='usb-charger'){box(1.6,.38,.85,white,0,.25,0,.14);box(.09,.13,.32,black,.83,.27,0,.01);box(.5,.03,.12,led,-.25,.46,0,.02);bar([-.7,.33,0],[-1.3,.2,.7],.03,black);box(.35,.17,.25,silver,-1.34,.2,.73,.02);}
+if(id==='charging-base'){box(2.4,.18,1.85,black,0,.18,0,.1);box(.25,.7,1.85,white,-.88,.6,0,.1);box(.06,.14,1.5,led,-.73,.71,0,.025);for(const z of [-.46,.46])box(.8,.05,.22,silver,.35,.31,z,.025);box(.9,.03,.85,blue,.05,.3,0,.03);}
+if(id==='gripper-kit'){box(1.5,.17,1.35,black,-.3,.2,0,.07);box(.5,.68,.65,blue,-.3,.6,0,.1);bar([-.3,.85,0],[.6,1.3,0],.1,silver);box(.45,.25,.48,orange,.65,1.3,0,.05);for(const z of [-.3,.3]){bar([.66,1.3,z],[1.12,1.1,z],.07,silver);bar([1.12,1.1,z],[1.22,.87,z],.07,black);}}
+if(id==='controller-board'){pcb(0,.2,0,2.25,1.5);box(.86,.13,.85,silver,-.26,.33,0,.04);box(.4,.12,.35,black,.77,.33,0,.025);for(const z of [-.6,.6])box(1.9,.16,.12,black,0,.33,z,.03);box(.15,.12,.36,silver,-1.11,.33,0,.02);}
+}
+renderer.render(scene,camera);window.renderReady=true;
+</script></body></html>

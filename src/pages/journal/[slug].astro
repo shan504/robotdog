@@ -1,27 +1,28 @@
 ---
+import { siteUrl } from '../../config/site';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { articles, type Article } from '../../data/articles';
 export function getStaticPaths() { return articles.map((article) => ({ params: { slug: article.slug }, props: { article } })); }
 const { article } = Astro.props as { article: Article };
 const related = articles.filter((item) => item.slug !== article.slug).slice(0, 3);
-const articleUrl = `https://robotdogcxy.xyz/journal/${article.slug}/`;
+const articleUrl = `${siteUrl}/journal/${article.slug}/`;
 const schema = [
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-    { '@type': 'ListItem', position: 1, name: '首页', item: 'https://robotdogcxy.xyz/' },
-    { '@type': 'ListItem', position: 2, name: '探索与未来', item: 'https://robotdogcxy.xyz/journal/' },
+    { '@type': 'ListItem', position: 1, name: '首页', item: `${siteUrl}/` },
+    { '@type': 'ListItem', position: 2, name: '探索与未来', item: `${siteUrl}/journal/` },
     { '@type': 'ListItem', position: 3, name: article.title, item: articleUrl },
   ] },
   { '@context': 'https://schema.org', '@type': 'Article', headline: article.title, description: article.seoDescription,
     datePublished: article.date, dateModified: article.date, inLanguage: 'zh-CN', mainEntityOfPage: articleUrl,
-    author: { '@type': 'Organization', name: 'RobotDog', url: 'https://robotdogcxy.xyz/' },
-    publisher: { '@type': 'Organization', name: 'RobotDog', url: 'https://robotdogcxy.xyz/' },
-    image: `https://robotdogcxy.xyz${article.coverImage}`, articleSection: article.category,
+    author: { '@type': 'Organization', name: 'RobotCar', url: `${siteUrl}/` },
+    publisher: { '@type': 'Organization', name: 'RobotCar', url: `${siteUrl}/` },
+    image: `${siteUrl}${article.coverImage}`, articleSection: article.category,
   },
 ];
 ---
 <Layout title={article.seoTitle} description={article.seoDescription} schema={schema}>
-  <section class="insight-hero"><img src={article.coverImage} alt={`${article.category}主题概念场景`} width="1536" height="1024" fetchpriority="high"/><div class="insight-hero-shade"></div><div class="container insight-hero-content"><nav aria-label="面包屑导航"><a href="/">首页</a><span>/</span><a href="/journal/">探索与未来</a><span>/</span><span aria-current="page">{article.category}</span></nav><span class="insight-kicker">{article.eyebrow || 'IDEAS INTO PRACTICE'} / {article.category}</span><h1>{article.title}</h1><p>{article.excerpt}</p><div class="insight-byline"><span>RobotDog 编辑</span><time datetime={article.date}>编辑于 {article.date.replaceAll('-', '.')}</time><span><Icon name="clock" size={15}/>{article.readTime}</span></div></div></section>
+  <section class="insight-hero"><img src={article.coverImage} alt={`${article.category}主题概念场景`} width="1536" height="1024" fetchpriority="high"/><div class="insight-hero-shade"></div><div class="container insight-hero-content"><nav aria-label="面包屑导航"><a href="/">首页</a><span>/</span><a href="/journal/">探索与未来</a><span>/</span><span aria-current="page">{article.category}</span></nav><span class="insight-kicker">{article.eyebrow || 'IDEAS INTO PRACTICE'} / {article.category}</span><h1>{article.title}</h1><p>{article.excerpt}</p><div class="insight-byline"><span>RobotCar 编辑</span><time datetime={article.date}>编辑于 {article.date.replaceAll('-', '.')}</time><span><Icon name="clock" size={15}/>{article.readTime}</span></div></div></section>
   <div class="container insight-body">
     <aside class="insight-toc" aria-label="文章目录"><span class="insight-kicker">阅读导航</span><nav>{article.sections.map((section, index) => <a href={`#section-${index + 1}`}><span>0{index + 1}</span>{section.heading}</a>)}</nav><a class="insight-back" href="/journal/"><Icon name="arrow" size={16}/>返回探索与未来</a></aside>
     <article class="insight-prose">{article.sections.map((section, index) => <section id={`section-${index + 1}`}><span class="insight-section-number">0{index + 1}</span><h2>{section.heading}</h2>{section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}{section.bullets && <ul>{section.bullets.map((bullet) => <li><Icon name="check" size={17}/>{bullet}</li>)}</ul>}{index === 1 && <figure><img src={article.coverImage} alt={`${article.category}研究与应用的概念示意`} width="1536" height="1024" loading="lazy"/><figcaption>{article.category} / 从方向解读，到真实的探索。图片为场景概念示意。</figcaption></figure>}</section>)}

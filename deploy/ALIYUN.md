@@ -1,83 +1,51 @@
-# Ubuntu / 阿里云部署
+# RobotCar Ubuntu / 阿里云部署
 
-目标域名：`robotdogcxy.xyz`。用户提供的服务器为 Ubuntu 22.04、2 核 CPU、1 GB 内存，公网 IPv4 为 `47.85.33.165`。网站是 Astro 静态输出，服务器运行 Nginx，无需安装 Node.js 或数据库。
+这是 Astro 静态网站，Nginx 提供页面，服务器不需要 Node.js。新域名尚未指定，先在项目 `.env` 中设置实际购买的 `PUBLIC_SITE_URL=https://你的新域名`，然后运行 `npm run package:deploy` 并提交新部署包、校验文件和 build-info.json。
 
-## 首次部署
+## 服务器安装
 
-在阿里云 Workbench 的 Ubuntu 终端执行，每条命令成功后再执行下一条：
+在 Ubuntu 终端逐条执行：
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y nginx curl ca-certificates
-curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/deploy/ubuntu-deploy.sh -o robotdog-deploy.sh
-sudo bash robotdog-deploy.sh
+curl -fL https://raw.githubusercontent.com/shan504/robotdog/main/deploy/ubuntu-deploy.sh -o /tmp/robotcar-deploy.sh
+sudo bash /tmp/robotcar-deploy.sh 你的实际新域名
 ```
 
-脚本从本仓库下载预构建网站包和 SHA-256 校验文件，通过校验后安装到 `/var/www/robotdogcxy/releases/`，再切换 `current` 链接。Nginx 检查通过后才重载，并等待本机首页与本次部署的文件完全一致，最多检查 10 次。重载成功返回时新配置可能仍在切换，脚本会重试，避免将暂时返回的默认欢迎页当成部署失败。部署失败会显示具体阶段、命令和退出码，再恢复本次修改的入口；旧版本目录保留。首次部署创建 `/etc/nginx/sites-available/robotdogcxy`，后续更新保留 Certbot 增加的 HTTPS 配置。
+将最后一条中的域名换成不带协议、路径的实际域名。脚本拒绝 `.example` 占位域名，并核对部署包的站点地图包含该 HTTPS 域名。当前占位域名预览包不能直接作为新域名生产部署。
 
-脚本不会删除其他站点或覆盖非本项目配置。若该域名已在其他 Nginx 配置中使用，脚本会显示冲突文件并停止；先检查现有配置，再决定如何调整。不要直接删除其他网站配置。
+脚本校验 SHA-256，部署到 `/var/www/robotcar/releases/` 并切换 `current`。站点配置在 `/etc/nginx/sites-available/robotcar`。Nginx 重载后最多检查首页 10 次，确认与部署文件完全一致。失败会显示原因并回滚本次入口修改，后续更新保留已添加的 HTTPS 配置。
 
-阿里云轻量服务器防火墙需要放行 TCP 80 和 443。域名解析的 `@` A 记录应指向 `47.85.33.165`。若 Ubuntu 已启用 UFW，再运行 `sudo ufw allow 'Nginx Full'`；不要为部署启用或重置 UFW。
+部署脚本使用新的 RobotCar 路径，不删除其他网站。若同一域名存在其他站点配置，脚本显示冲突并停止。
 
-部署成功后用浏览器访问 `http://robotdogcxy.xyz/`。本机请求通过不能证明公网 DNS 与防火墙已生效，仍需外部浏览器确认。
+## 域名和防火墙
+
+域名的 `@` A 记录应指向服务器公网 IP。若继续使用原服务器，用户提供的 IP 为 `47.85.33.165`。新域名须能从公共 DNS 查询到正确地址。阿里云轻量服务器防火墙放行 TCP 80 和 443。若 UFW 已启用，可运行 `sudo ufw allow 'Nginx Full'`。
 
 ## HTTPS
 
-确认域名的 HTTP 网站可从公网访问后，在同一个 Ubuntu 终端执行：
+HTTP 网站能在公网打开后，在同一个 Ubuntu 终端逐条执行：
 
 ```bash
 sudo apt-get install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d robotdogcxy.xyz --redirect
+sudo certbot --nginx -d 你的实际新域名 --redirect
 sudo certbot renew --dry-run
 ```
 
-按 Certbot 提示填写联系邮箱并阅读、确认服务条款。证书成功后访问 `https://robotdogcxy.xyz/`，HTTP 会重定向到 HTTPS。`www` 不是本次部署要求，不需要额外解析或证书。
+按提示填写邮箱并阅读、确认条款。Certbot 安装证书、配置 HTTPS，并将 HTTP 重定向到 HTTPS。不要在 DNS 尚未生效或域名被暂停解析时申请证书。
 
-页面 canonical、结构化数据、分享图片 URL、robots 与站点地图统一使用 `https://robotdogcxy.xyz`；因此首次 HTTP 验证后应完成 HTTPS 步骤。
+`nginx-http.conf` 和 `nginx-https.conf` 使用 `__ROBOTCAR_DOMAIN__` 占位符。部署脚本会替换 HTTP 模板；手工使用 HTTPS 模板时必须替换域名并先取得对应证书。
 
-## 后续更新
+## 更新与检查
 
-### 已撤销的 Google Search Console 验证文件
-
-按用户要求，已移除 `public/googlecffa0146307cc419.html`。当前构建和部署包不再包含此文件。先前执行过单独安装命令的网站，需要在实际 Ubuntu 服务器同步删除正在运行的站点中的文件：
-
-```bash
-sudo rm -f -- /var/www/robotdogcxy/current/googlecffa0146307cc419.html
-```
-
-移除验证文件可能影响 Search Console 所有权验证。此文件属于 HTML 文件验证方式，不是 DNS TXT 记录；本次项目修改没有更改用户 DNS 配置。现有博客截图不能证明 Google 验证造成注册局 `serverHold`，删除文件也不能保证域名恢复解析。注册局暂停仍需按具体举报依据申请解除。
-
-### 构建并部署更新
-
-在开发电脑或 Codex 环境更新源码后运行：
-
-```bash
-npm ci
-npm run package:deploy
-npm run export:preview
-```
-
-`package:deploy` 构建网站并生成：
-
-- `deploy/robotdog-site.tar.gz`：完整生产静态网站。
-- `deploy/robotdog-site.tar.gz.sha256`：校验文件。
-- `deploy/build-info.json`：域名、页面数和构建信息。
-
-将源码与以上三个文件一起提交到本仓库 `main`。Ubuntu 上重新下载并执行 `ubuntu-deploy.sh` 即可更新。不要在 1 GB 服务器上依赖开发服务器对外提供网站。
-
-## 检查与回滚
+更新源码、配置新域名后，运行 `npm run package:deploy`，提交所有部署产物，再在服务器重新下载执行安装脚本。
 
 ```bash
 sudo nginx -t
 sudo systemctl status nginx --no-pager
-curl -I http://robotdogcxy.xyz/
-curl -I https://robotdogcxy.xyz/sitemap.xml
-readlink /var/www/robotdogcxy/current
-ls -1 /var/www/robotdogcxy/releases/
+readlink /var/www/robotcar/current
+ls -1 /var/www/robotcar/releases/
 ```
 
-手动回滚时，先从 releases 中确认要恢复的版本目录；创建新的临时链接指向它，再用 `sudo mv -Tf` 切换 current，检查 Nginx 后重载。不要删除全部 releases，以便保留恢复路径。
-
-该站点目前是公开展示与购物流程演示：价格参数是展示样例，支付不会扣款。真实收款需要服务端订单、商户签名与回调。发布销售前补全实际销售资料及联系方式。
-
-本仓库的构建、浏览器与本地 Nginx 检查不等同于已登录阿里云或完成服务器部署；服务器执行结果和公网 HTTPS 需要在实际服务器确认。
+旧版本目录保留，回滚前确认目标版本与配置。购物、订单和支付仍为浏览器演示，正式收款需要服务端和商户渠道。

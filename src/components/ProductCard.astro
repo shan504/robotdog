@@ -3,13 +3,13 @@ import Icon from './Icon.astro';
 import { formatPrice, type Product } from '../data/catalog';
 interface Props { product: Product; index?: number; compare?: boolean; compact?: boolean }
 const { product, compact = false } = Astro.props;
-const productImage = product.kind === 'robot' ? product.image.replace(/\.jpg$/, '-cutout.png') : product.image;
+const productImage = product.kind === 'car' ? product.image : product.image;
 ---
 <article class:list={['shop-card', { 'shop-card-compact': compact, 'shop-card-accessory': product.kind === 'accessory' }]} data-product-card data-family={product.family} data-kind={product.kind} data-slug={product.slug} data-search={`${product.name} ${product.category} ${product.shortDescription}`}>
   <a class="shop-card-link" href={`/products/${product.slug}/`} aria-label={`查看 ${product.name} 的配置和参数`}>
     <div class="shop-card-image">
       {product.badge && <span class="shop-card-badge">{product.badge}</span>}
-      <img src={productImage} alt={`${product.name} ${product.kind === 'robot' ? '四足机器狗' : '机器人配件'}`} width="720" height="640" loading="lazy"/>
+      <img src={productImage} alt={`${product.name} ${product.kind === 'car' ? '玩具机器人车' : '机器人配件'}`} width="720" height="640" loading="lazy"/>
       <span class="shop-card-explore">了解产品 <Icon name="diagonal" size={15}/></span>
     </div>
     <div class="shop-card-content">

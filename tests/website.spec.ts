@@ -1,14 +1,15 @@
 import { test as base, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { products, robotProducts, accessoryProducts, families, formatPrice } from '../src/data/catalog';
+import { products, carProducts, accessoryProducts, families, formatPrice } from '../src/data/catalog';
 import { solutions } from '../src/data/solutions';
 import { articles } from '../src/data/articles';
 
-const CART = 'robotdog.cart.v2';
-const SELECTION = 'robotdog.selection.v2';
-const ORDER = 'robotdog.order.v2';
-const sampleRobot = robotProducts.find(product => product.slug === 'go2-pro')!;
-const secondRobot = robotProducts.find(product => product.slug === 'as2-pro') || robotProducts[4];
+const siteOrigin = process.env.PUBLIC_SITE_URL || 'https://robotcar.example';
+const CART = 'robotcar.cart.v2';
+const SELECTION = 'robotcar.selection.v2';
+const ORDER = 'robotcar.order.v2';
+const sampleCar = carProducts.find(product => product.slug === 'sprint-pro')!;
+const secondCar = carProducts.find(product => product.slug === 'rover-pro') || carProducts[4];
 const sampleAccessory = accessoryProducts[0];
 const publicPaths = ['/', '/products/', '/solutions/', '/journal/', '/about/', '/privacy/', ...products.map(product => `/products/${product.slug}/`), ...solutions.map(solution => `/solutions/${solution.slug}/`), ...articles.map(article => `/journal/${article.slug}/`)];
 
@@ -36,9 +37,9 @@ async function seedStorage(page: Page, entries: Record<string, unknown>) {
   }, entries);
 }
 
-function demoOrder(items = [{ slug: sampleRobot.slug, quantity: 2 }]) {
+function demoOrder(items = [{ slug: sampleCar.slug, quantity: 2 }]) {
   return {
-    id: 'RD20261011-QATEST1234', createdAt: '2026-10-11T03:00:00.000Z', status: 'awaiting_demo_payment', method: 'wechat',
+    id: 'RC20261014-QATEST1234', createdAt: '2026-10-11T03:00:00.000Z', status: 'awaiting_demo_payment', method: 'wechat',
     recipient: '测试收货人', phone: '13800000000', region: '浙江省 杭州市 滨江区', address: '机器人路 1 号测试实验室', invoice: '', note: '浏览器演示测试',
     items: items.map(item => { const product = products.find(product => product.slug === item.slug)!; return { ...item, name: product.name, priceCNY: product.priceCNY }; }),
   };
@@ -75,16 +76,16 @@ test('home has new navigation, loaded local imagery and product navigation', asy
   await expect(page.locator('.catalog-sidebar')).toBeVisible();
 });
 
-test('catalog shows at least 20 robots with a left sidebar and readable names, prices, descriptions and cart icons', async ({ page }) => {
+test('catalog shows at least 20 toy cars with a left sidebar and readable names, prices, descriptions and cart icons', async ({ page }) => {
   await openPage(page, '/products/');
-  expect(robotProducts.length).toBeGreaterThanOrEqual(20);
+  expect(carProducts.length).toBeGreaterThanOrEqual(20);
   expect(accessoryProducts.length).toBeGreaterThanOrEqual(8);
   const cards = page.locator('#product-list [data-product-card]:visible');
-  await expect(cards).toHaveCount(robotProducts.length);
+  await expect(cards).toHaveCount(carProducts.length);
   const sidebar = await page.locator('.catalog-sidebar').boundingBox();
   const listing = await page.locator('#product-list').boundingBox();
   expect(sidebar!.x + sidebar!.width).toBeLessThan(listing!.x);
-  for (const product of robotProducts) {
+  for (const product of carProducts) {
     const card = page.locator(`#product-list [data-product-card][data-slug="${product.slug}"]`);
     await expect(card.locator('h3')).toHaveText(product.name);
     await expect(card.locator('.shop-card-price')).toContainText(formatPrice(product.priceCNY));
@@ -93,28 +94,28 @@ test('catalog shows at least 20 robots with a left sidebar and readable names, p
     await expect(card.locator('[data-add-to-cart] svg')).toHaveCount(1);
     await expect(card.locator('a')).toHaveAttribute('href', `/products/${product.slug}/`);
   }
-  for (const source of await cards.locator('img').evaluateAll(images => images.map(image => image.getAttribute('src')))) expect(source).toMatch(/^\/images\/catalog\//);
+  for (const source of await cards.locator('img').evaluateAll(images => images.map(image => image.getAttribute('src')))) expect(source).toMatch(/^\/images\/cars\//);
   await expectLoadedImage(page, '#product-list img');
 });
 
 test('catalog family filter, deep links, search, empty search and accessory categories work', async ({ page }) => {
-  const family = families.find(family => family.slug === sampleRobot.family)!;
+  const family = families.find(family => family.slug === sampleCar.family)!;
   await openPage(page, '/products/');
   await page.locator(`[data-family-filter="${family.slug}"]`).click();
   await expect(page).toHaveURL(new RegExp(`family=${family.slug}`));
-  await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.filter(product => product.family === family.slug).length);
+  await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.filter(product => product.family === family.slug).length);
   await expect(page.locator(`[data-family-filter="${family.slug}"]`)).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
   await expect(page.locator('#current-family')).toContainText(family.name);
-  await page.getByRole('searchbox').fill(sampleRobot.name);
-  const matchingNames = robotProducts.filter(product => product.family === family.slug && `${product.name} ${product.category} ${product.shortDescription}`.toLowerCase().includes(sampleRobot.name.toLowerCase())).map(product => product.name);
+  await page.getByRole('searchbox').fill(sampleCar.name);
+  const matchingNames = carProducts.filter(product => product.family === family.slug && `${product.name} ${product.category} ${product.shortDescription}`.toLowerCase().includes(sampleCar.name.toLowerCase())).map(product => product.name);
   await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(matchingNames.length);
   await expect(page.locator('#product-list h3:visible')).toHaveText(matchingNames);
   await page.getByRole('searchbox').fill('ZZZ-no-such-robot');
   await expect(page.locator('#catalog-empty')).toBeVisible();
   await page.locator('#reset-search').click();
   await expect(page.getByRole('searchbox')).toHaveValue('');
-  await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.length);
+  await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.length);
   await page.locator('#view-accessories').click();
   await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(accessoryProducts.length);
   await expect(page.locator('#accessory-rail')).not.toBeVisible();
@@ -124,7 +125,7 @@ test('catalog family filter, deep links, search, empty search and accessory cate
   await expect(page.locator('#product-list [data-product-card]:visible')).toHaveCount(accessoryProducts.length);
 });
 
-for (const product of [sampleRobot, secondRobot, sampleAccessory]) {
+for (const product of [sampleCar, secondCar, sampleAccessory]) {
   test(`${product.slug} card opens full specification, configuration, kit and variants`, async ({ page }) => {
     await openPage(page, `/products/?family=${product.family}`);
     await page.locator(`#product-list [data-slug="${product.slug}"] .shop-card-image`).click();
@@ -152,12 +153,12 @@ for (const product of [sampleRobot, secondRobot, sampleAccessory]) {
   });
 }
 
-test('cart buttons add robots and accessories, header badge persists across pages and refresh', async ({ page }) => {
+test('cart buttons add toy cars and accessories, header badge persists across pages and refresh', async ({ page }) => {
   await openPage(page, '/products/');
-  await page.locator(`#product-list [data-add-to-cart="${sampleRobot.slug}"]`).click();
+  await page.locator(`#product-list [data-add-to-cart="${sampleCar.slug}"]`).click();
   await expect(page.locator('#cart-count')).toHaveText('1');
-  await expect(page.locator('#cart-toast')).toContainText(sampleRobot.name);
-  await page.locator(`#product-list [data-add-to-cart="${secondRobot.slug}"]`).click();
+  await expect(page.locator('#cart-toast')).toContainText(sampleCar.name);
+  await page.locator(`#product-list [data-add-to-cart="${secondCar.slug}"]`).click();
   await page.locator('#view-accessories').click();
   await page.locator(`#product-list [data-add-to-cart="${sampleAccessory.slug}"]`).click();
   await expect(page.locator('#cart-count')).toHaveText('3');
@@ -166,32 +167,32 @@ test('cart buttons add robots and accessories, header badge persists across page
   await page.locator('#header-cart').click();
   await expect(page).toHaveURL('/orders/');
   await expect(page.locator('[data-cart-row]:visible')).toHaveCount(3);
-  for (const product of [sampleRobot, secondRobot, sampleAccessory]) await expect(page.locator(`[data-cart-row="${product.slug}"]`)).toContainText(product.name);
-  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleRobot.priceCNY + secondRobot.priceCNY + sampleAccessory.priceCNY));
+  for (const product of [sampleCar, secondCar, sampleAccessory]) await expect(page.locator(`[data-cart-row="${product.slug}"]`)).toContainText(product.name);
+  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleCar.priceCNY + secondCar.priceCNY + sampleAccessory.priceCNY));
 });
 
 test('orders quantity buttons, inputs, selection, totals and removals stay consistent', async ({ page }) => {
-  await seedStorage(page, { [CART]: [{ slug: sampleRobot.slug, quantity: 1 }, { slug: secondRobot.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }] });
+  await seedStorage(page, { [CART]: [{ slug: sampleCar.slug, quantity: 1 }, { slug: secondCar.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }] });
   await openPage(page, '/orders/');
-  const quantity = page.locator(`[data-quantity="${sampleRobot.slug}"]`);
-  await expect(page.locator(`[data-quantity-minus="${sampleRobot.slug}"]`)).toBeDisabled();
-  await page.locator(`[data-quantity-plus="${sampleRobot.slug}"]`).click();
+  const quantity = page.locator(`[data-quantity="${sampleCar.slug}"]`);
+  await expect(page.locator(`[data-quantity-minus="${sampleCar.slug}"]`)).toBeDisabled();
+  await page.locator(`[data-quantity-plus="${sampleCar.slug}"]`).click();
   await expect(quantity).toHaveValue('2');
-  await page.locator(`[data-quantity-minus="${sampleRobot.slug}"]`).click();
+  await page.locator(`[data-quantity-minus="${sampleCar.slug}"]`).click();
   await expect(quantity).toHaveValue('1');
   await quantity.fill('3');
   await quantity.blur();
-  await expect(page.locator(`[data-subtotal="${sampleRobot.slug}"]`)).toHaveText(formatPrice(sampleRobot.priceCNY * 3));
+  await expect(page.locator(`[data-subtotal="${sampleCar.slug}"]`)).toHaveText(formatPrice(sampleCar.priceCNY * 3));
   await expect(page.locator('#selected-count')).toHaveText('5');
   await expect(page.locator('#cart-count')).toHaveText('5');
-  await page.locator(`[data-select-item="${secondRobot.slug}"]`).uncheck();
-  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleRobot.priceCNY * 3 + sampleAccessory.priceCNY));
+  await page.locator(`[data-select-item="${secondCar.slug}"]`).uncheck();
+  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleCar.priceCNY * 3 + sampleAccessory.priceCNY));
   expect(await page.locator('#select-all').evaluate((node: HTMLInputElement) => node.indeterminate)).toBe(true);
   await page.reload();
-  await expect(page.locator(`[data-select-item="${secondRobot.slug}"]`)).not.toBeChecked();
+  await expect(page.locator(`[data-select-item="${secondCar.slug}"]`)).not.toBeChecked();
   await page.locator(`[data-remove-item="${sampleAccessory.slug}"]`).click();
   await expect(page.locator(`[data-cart-row="${sampleAccessory.slug}"]`)).not.toBeVisible();
-  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleRobot.priceCNY * 3));
+  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleCar.priceCNY * 3));
   // A partial selection is unchecked + indeterminate; select all before toggling it off.
   await page.locator('#select-all').check();
   await expect(page.locator('#selected-count')).toHaveText('4');
@@ -205,9 +206,9 @@ test('orders quantity buttons, inputs, selection, totals and removals stay consi
 });
 
 test('checkout requires valid contact/address/agreement and preserves a local draft', async ({ page }) => {
-  await seedStorage(page, { [CART]: [{ slug: sampleRobot.slug, quantity: 2 }] });
+  await seedStorage(page, { [CART]: [{ slug: sampleCar.slug, quantity: 2 }] });
   await openPage(page, '/checkout/');
-  await expect(page.locator('#checkout-total')).toHaveText(formatPrice(sampleRobot.priceCNY * 2));
+  await expect(page.locator('#checkout-total')).toHaveText(formatPrice(sampleCar.priceCNY * 2));
   await page.locator('#submit-order').click();
   await expect(page).toHaveURL('/checkout/');
   expect(await page.locator('#checkout-form').evaluate((form: HTMLFormElement) => form.checkValidity())).toBe(false);
@@ -230,14 +231,14 @@ test('checkout requires valid contact/address/agreement and preserves a local dr
 test('selected products go through checkout, chosen payment demo and downloadable result without a real transaction', async ({ page }) => {
   const posts: string[] = [];
   page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
-  await seedStorage(page, { [CART]: [{ slug: sampleRobot.slug, quantity: 2 }, { slug: secondRobot.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }] });
+  await seedStorage(page, { [CART]: [{ slug: sampleCar.slug, quantity: 2 }, { slug: secondCar.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }] });
   await openPage(page, '/orders/');
-  await page.locator(`[data-select-item="${secondRobot.slug}"]`).uncheck();
+  await page.locator(`[data-select-item="${secondCar.slug}"]`).uncheck();
   await page.locator('#go-checkout').click();
   await expect(page).toHaveURL('/checkout/');
   await expect(page.locator('[data-summary-item]:visible')).toHaveCount(2);
-  await expect(page.locator(`[data-summary-item="${secondRobot.slug}"]`)).not.toBeVisible();
-  const total = sampleRobot.priceCNY * 2 + sampleAccessory.priceCNY;
+  await expect(page.locator(`[data-summary-item="${secondCar.slug}"]`)).not.toBeVisible();
+  const total = sampleCar.priceCNY * 2 + sampleAccessory.priceCNY;
   await expect(page.locator('#checkout-total')).toHaveText(formatPrice(total));
   await fillCheckout(page);
   await page.locator('input[name="method"][value="alipay"]').check();
@@ -256,7 +257,7 @@ test('selected products go through checkout, chosen payment demo and downloadabl
     const cart = JSON.parse(localStorage.getItem(key)!);
     cart.find((item: { slug: string; quantity: number }) => item.slug === slug).quantity += 1;
     localStorage.setItem(key, JSON.stringify(cart));
-  }, { key: CART, slug: sampleRobot.slug });
+  }, { key: CART, slug: sampleCar.slug });
   await page.locator('#simulate-payment').click();
   await expect(page).toHaveURL('/orders/success/');
   await expect(page.locator('#success-result')).toBeVisible();
@@ -268,16 +269,16 @@ test('selected products go through checkout, chosen payment demo and downloadabl
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#download-demo-order').click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/RobotDog.*\.txt$/);
+  expect(download.suggestedFilename()).toMatch(/RobotCar.*\.txt$/);
   const text = await readFile((await download.path())!, 'utf8');
-  expect(text).toContain(sampleRobot.name);
+  expect(text).toContain(sampleCar.name);
   expect(text).toContain(sampleAccessory.name);
   expect(text).toContain('演示');
   expect(posts, 'Preview checkout must not submit a real order or payment').toEqual([]);
   await openPage(page, '/orders/');
   await expect(page.locator('[data-cart-row]:visible')).toHaveCount(2);
-  await expect(page.locator(`[data-quantity="${sampleRobot.slug}"]`)).toHaveValue('1');
-  await expect(page.locator(`[data-quantity="${secondRobot.slug}"]`)).toHaveValue('1');
+  await expect(page.locator(`[data-quantity="${sampleCar.slug}"]`)).toHaveValue('1');
+  await expect(page.locator(`[data-quantity="${secondCar.slug}"]`)).toHaveValue('1');
   await expect(page.locator(`[data-cart-row="${sampleAccessory.slug}"]`)).not.toBeVisible();
   await expect(page.locator('#cart-count')).toHaveText('2');
 });
@@ -293,7 +294,7 @@ test('empty, stale and malformed browser storage presents safe empty states', as
   await expect(page.locator('#empty-cart')).toBeVisible();
   await openPage(page, '/payment/');
   await expect(page.locator('#missing-payment')).toBeVisible();
-  await seedStorage(page, { [CART]: [{ slug: 'removed-product', quantity: 2 }, { slug: sampleRobot.slug, quantity: -1 }, { slug: sampleAccessory.slug, quantity: '99' }], [ORDER]: { id: 'forged', items: [{ slug: 'removed-product', quantity: 1 }] } });
+  await seedStorage(page, { [CART]: [{ slug: 'removed-product', quantity: 2 }, { slug: sampleCar.slug, quantity: -1 }, { slug: sampleAccessory.slug, quantity: '99' }], [ORDER]: { id: 'forged', items: [{ slug: 'removed-product', quantity: 1 }] } });
   await openPage(page, '/orders/');
   await expect(page.locator('#empty-cart')).toBeVisible();
   await openPage(page, '/orders/success/');
@@ -304,16 +305,16 @@ test('corrupted quantities are bounded, duplicate cart entries merge and catalog
   const order = demoOrder();
   order.items[0].name = 'forged name';
   order.items[0].priceCNY = 1;
-  await seedStorage(page, { [CART]: [{ slug: sampleRobot.slug, quantity: 1.9 }, { slug: sampleRobot.slug, quantity: 2 }, { slug: sampleAccessory.slug, quantity: 1000 }], [ORDER]: order });
+  await seedStorage(page, { [CART]: [{ slug: sampleCar.slug, quantity: 1.9 }, { slug: sampleCar.slug, quantity: 2 }, { slug: sampleAccessory.slug, quantity: 1000 }], [ORDER]: order });
   await openPage(page, '/orders/');
   await expect(page.locator('[data-cart-row]:visible')).toHaveCount(2);
-  await expect(page.locator(`[data-quantity="${sampleRobot.slug}"]`)).toHaveValue('3');
+  await expect(page.locator(`[data-quantity="${sampleCar.slug}"]`)).toHaveValue('3');
   await expect(page.locator(`[data-quantity="${sampleAccessory.slug}"]`)).toHaveValue('99');
   await expect(page.locator(`[data-quantity-plus="${sampleAccessory.slug}"]`)).toBeDisabled();
-  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleRobot.priceCNY * 3 + sampleAccessory.priceCNY * 99));
+  await expect(page.locator('#cart-total')).toHaveText(formatPrice(sampleCar.priceCNY * 3 + sampleAccessory.priceCNY * 99));
   await openPage(page, '/payment/');
-  await expect(page.locator('#payment-total')).toHaveText(formatPrice(sampleRobot.priceCNY * 2));
-  await expect(page.locator(`[data-payment-item="${sampleRobot.slug}"]`)).toContainText(sampleRobot.name);
+  await expect(page.locator('#payment-total')).toHaveText(formatPrice(sampleCar.priceCNY * 2));
+  await expect(page.locator(`[data-payment-item="${sampleCar.slug}"]`)).toContainText(sampleCar.name);
 });
 
 test('applications, future stories and about content use loaded pictures and navigate to substantive pages', async ({ page }) => {
@@ -364,15 +365,15 @@ test('inquiry validates locally and downloads the product request without submit
   await expect(page.locator('#inquiry-result')).not.toBeVisible();
   await dialog.getByLabel('你的称呼').fill('测试客户');
   await dialog.getByLabel('联系邮箱').fill('buyer@example.com');
-  await dialog.getByLabel('感兴趣的产品').selectOption(sampleRobot.name);
-  await dialog.getByLabel('使用需求').fill('高校机器人课程，希望了解开发接口与配置。');
+  await dialog.getByLabel('感兴趣的产品').selectOption(sampleCar.name);
+  await dialog.getByLabel('使用需求').fill('STEM机器人课程，希望了解开发接口与配置。');
   await dialog.getByRole('button', { name: '生成询价单' }).click();
-  await expect(page.locator('#inquiry-summary')).toContainText(sampleRobot.name);
+  await expect(page.locator('#inquiry-summary')).toContainText(sampleCar.name);
   await expect(page.locator('#inquiry-summary')).toContainText('尚未发送');
   const downloadPromise = page.waitForEvent('download');
   await dialog.getByRole('button', { name: '下载询价单' }).click();
   const download = await downloadPromise;
-  expect(await readFile((await download.path())!, 'utf8')).toContain(sampleRobot.name);
+  expect(await readFile((await download.path())!, 'utf8')).toContain(sampleCar.name);
   expect(posts).toEqual([]);
   await dialog.getByRole('button', { name: '关闭询价窗口' }).click();
   await expect(dialog).not.toBeVisible();
@@ -384,26 +385,26 @@ test('all public pages have distinct SEO metadata, correct sitemap coverage, wor
   expect(sitemap.status()).toBe(200);
   const urls = [...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
   expect(new Set(urls).size).toBe(urls.length);
-  expect(new Set(urls)).toEqual(new Set(publicPaths.map(path => `https://robotdogcxy.xyz${path}`)));
+  expect(new Set(urls)).toEqual(new Set(publicPaths.map(path => `${siteOrigin}${path}`)));
   expect(urls.some(url => /\/(orders|checkout|payment)\//.test(url))).toBe(false);
   const robots = await request.get('/robots.txt');
-  expect(await robots.text()).toContain('Sitemap: https://robotdogcxy.xyz/sitemap.xml');
+  expect(await robots.text()).toContain(`Sitemap: ${siteOrigin}/sitemap.xml`);
   const titles = new Set<string>();
   const descriptions = new Set<string>();
   const resources = new Map<string, boolean>();
   for (const path of publicPaths) {
     await openPage(page, path);
     const title = await page.title();
-    expect(title, path).toContain('RobotDog');
+    expect(title, path).toContain('RobotCar');
     expect(titles.has(title), `Duplicate title on ${path}`).toBe(false);
     titles.add(title);
     const description = (await page.locator('meta[name="description"]').getAttribute('content'))!;
     expect(description.length, `${path} needs a useful description`).toBeGreaterThan(20);
     expect(descriptions.has(description), `Duplicate description on ${path}`).toBe(false);
     descriptions.add(description);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://robotdogcxy.xyz${path}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${siteOrigin}${path}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', process.env.PUBLIC_SITE_URL ? 'index, follow' : 'noindex, nofollow');
     const content = await page.evaluate(() => ({
       links: [...document.querySelectorAll<HTMLAnchorElement>('a[href]')].map(link => link.href),
       images: [...document.querySelectorAll<HTMLImageElement>('img[src]')].map(image => ({ src: image.src, alt: image.getAttribute('alt') })),
@@ -438,12 +439,12 @@ test('all public pages have distinct SEO metadata, correct sitemap coverage, wor
   }
 });
 
-const responsivePaths = ['/', '/products/', `/products/${sampleRobot.slug}/`, '/solutions/', '/journal/', '/about/', '/orders/', '/checkout/', '/payment/'];
+const responsivePaths = ['/', '/products/', `/products/${sampleCar.slug}/`, '/solutions/', '/journal/', '/about/', '/orders/', '/checkout/', '/payment/'];
 for (const width of [390, 1440]) {
   test(`${width}px layouts fit every main page and mobile navigation opens and follows links`, async ({ page }) => {
     test.setTimeout(90_000);
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
-    await seedStorage(page, { [CART]: [{ slug: sampleRobot.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }], [ORDER]: demoOrder() });
+    await seedStorage(page, { [CART]: [{ slug: sampleCar.slug, quantity: 1 }, { slug: sampleAccessory.slug, quantity: 1 }], [ORDER]: demoOrder() });
     for (const path of responsivePaths) {
       await openPage(page, path);
       const dimensions = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth, body: document.body.scrollWidth }));

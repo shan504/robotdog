@@ -1,3 +1,4 @@
+import { siteUrl } from '../config/site';
 import type { APIRoute } from 'astro';
 import { articles } from '../data/articles';
 import { products } from '../data/catalog';
@@ -5,7 +6,7 @@ import { solutions } from '../data/solutions';
 
 export const prerender = true;
 
-const origin = 'https://robotdogcxy.xyz';
+const origin = siteUrl;
 const pages = [
   '/',
   '/products/',

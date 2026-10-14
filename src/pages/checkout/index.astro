@@ -3,12 +3,12 @@ import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { products, formatPrice } from '../../data/catalog';
 ---
-<Layout title="确认订单与收货信息｜RobotDog" description="确认已选机器狗与配件，填写收货信息并选择微信或支付宝支付演示。" noindex>
+<Layout title="确认订单与收货信息｜RobotCar" description="确认已选玩具机器人车与配件，填写收货信息并选择微信或支付宝支付演示。" noindex>
   <section class="checkout-page container">
     <div class="breadcrumb"><a href="/products/">产品系列</a><span>/</span><a href="/orders/">购物车</a><span>/</span><span>确认订单</span></div>
     <div class="checkout-heading"><span class="eyebrow">READY FOR THE NEXT STEP</span><h1>让探索，准备出发。</h1><p>核对装备与收货信息，完成你的机器人订单。</p></div>
     <ol class="checkout-steps" aria-label="购买流程"><li><a href="/orders/"><span>01</span>购物车</a></li><li class="current"><span>02</span>确认订单</li><li><span>03</span>支付演示</li></ol>
-    <div class="no-order" id="no-order" hidden><Icon name="cart" size={46}/><h2>还没有待结算的产品。</h2><p>先选一台机器狗，或者回到购物车勾选需要的产品。</p><a href="/orders/" class="button button-dark">返回购物车 <Icon name="arrow" size={18}/></a></div>
+    <div class="no-order" id="no-order" hidden><Icon name="cart" size={46}/><h2>还没有待结算的产品。</h2><p>先选一台玩具机器人车，或者回到购物车勾选需要的产品。</p><a href="/orders/" class="button button-dark">返回购物车 <Icon name="arrow" size={18}/></a></div>
     <form id="checkout-form" class="checkout-grid">
       <div class="checkout-main">
         <section class="checkout-card"><div class="card-title"><span>01</span><h2>收货与联系信息</h2><Icon name="shield" size={19}/></div><div class="form-grid"><label>收货人 <span>*</span><input name="recipient" autocomplete="name" required maxlength="60" placeholder="请输入收货人姓名"/></label><label>联系电话 <span>*</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[+0-9 ()-]{7,20}" maxlength="20" title="请输入 7–20 位有效联系电话，可包含 +、空格或连字符" placeholder="用于联系与配送"/></label><label class="full-width">所在地区 <span>*</span><input name="region" autocomplete="address-level1" required maxlength="100" placeholder="省 / 市 / 区，例如：浙江省 杭州市 滨江区"/></label><label class="full-width">详细地址 <span>*</span><input name="address" autocomplete="street-address" required maxlength="200" placeholder="街道、门牌号、楼栋及房间号"/></label></div><p class="privacy-note"><Icon name="shield" size={14}/>演示信息仅保存在当前浏览器，不会提交至服务器。请使用测试信息体验流程。<a href="/privacy/">隐私说明</a></p></section>
@@ -75,7 +75,7 @@ import { products, formatPrice } from '../../data/catalog';
       const now = new Date();
       const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
       const order: DemoOrder = {
-        id: `RD${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${now.getTime().toString(36).toUpperCase()}-${suffix}`,
+        id: `RC${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${now.getTime().toString(36).toUpperCase()}-${suffix}`,
         createdAt: now.toISOString(), status: 'awaiting_demo_payment', method: data.get('method') === 'alipay' ? 'alipay' : 'wechat', recipient: getField('recipient'), phone: getField('phone'), region: getField('region'), address: getField('address'), invoice: getField('invoice'), note: getField('note'),
         items: items.map(item => { const product = products.find(product => product.slug === item.slug)!; return { slug: product.slug, name: product.name, priceCNY: product.priceCNY, quantity: item.quantity }; }),
       };

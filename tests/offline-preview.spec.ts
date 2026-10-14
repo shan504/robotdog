@@ -1,12 +1,12 @@
 import { test as base, expect, type Page, type FrameLocator } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { products, robotProducts, accessoryProducts, formatPrice } from '../src/data/catalog';
+import { products, carProducts, accessoryProducts, formatPrice } from '../src/data/catalog';
 
-const robot = robotProducts.find(product => product.slug === 'go2-pro')!;
-const extraRobot = robotProducts.find(product => product.slug === 'as2-pro')!;
+const robot = carProducts.find(product => product.slug === 'sprint-pro')!;
+const extraCar = carProducts.find(product => product.slug === 'rover-pro')!;
 const accessory = accessoryProducts[0];
-const CART = 'robotdog.cart.v2';
-const SELECTION = 'robotdog.selection.v2';
+const CART = 'robotcar.cart.v2';
+const SELECTION = 'robotcar.selection.v2';
 
 const test = base.extend({
   page: async ({ page, context }, use) => {
@@ -22,7 +22,7 @@ const test = base.extend({
 });
 
 async function openPreview(page: Page) {
-  const html = await readFile(new URL('../RobotDog-preview.html', import.meta.url), 'utf8');
+  const html = await readFile(new URL('../RobotCar-preview.html', import.meta.url), 'utf8');
   expect(Buffer.byteLength(html)).toBeGreaterThan(1_000_000);
   await page.setContent(html, { waitUntil: 'load' });
   const frame = page.frameLocator('#website');
@@ -46,13 +46,13 @@ test('downloadable HTML supports deep-linked families, accessory filters and rea
   test.setTimeout(90_000);
   const frame = await openPreview(page);
   await expectEmbeddedImage(frame, 'main img');
-  await navigate(page, frame, '/products/?family=as2', '#product-list');
-  await expect(frame.locator('#current-family')).toContainText('As2');
-  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.filter(product => product.family === 'as2').length);
-  await frame.locator(`#product-list [data-slug="${extraRobot.slug}"] .shop-card-image`).click();
-  await expect(frame.locator('main h1')).toHaveText(extraRobot.name);
+  await navigate(page, frame, '/products/?family=rover', '#product-list');
+  await expect(frame.locator('#current-family')).toContainText('Rover');
+  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.filter(product => product.family === 'rover').length);
+  await frame.locator(`#product-list [data-slug="${extraCar.slug}"] .shop-card-image`).click();
+  await expect(frame.locator('main h1')).toHaveText(extraCar.name);
   await expectEmbeddedImage(frame, '#detail-main-image');
-  await expect(frame.locator('.specification-table')).toContainText('机械尺寸与驱动');
+  await expect(frame.locator('.specification-table')).toContainText('车身尺寸与驱动');
   await navigate(page, frame, '/products/#accessories', '#product-list');
   await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(accessoryProducts.length);
   await frame.locator('[data-family-filter="sensing"]').click();
@@ -60,16 +60,16 @@ test('downloadable HTML supports deep-linked families, accessory filters and rea
   await frame.getByRole('searchbox').fill('ZZZ-no-match');
   await expect(frame.locator('#catalog-empty')).toBeVisible();
   await frame.locator('#reset-search').click();
-  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.length);
+  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.length);
 });
 
 test('single-file cart persists between iframe pages through checkout, payment demo and downloaded order result', async ({ page }) => {
   test.setTimeout(90_000);
   const frame = await openPreview(page);
   await frame.getByRole('navigation', { name: '主导航', exact: true }).getByRole('link', { name: '产品系列' }).click();
-  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.length);
+  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.length);
   await frame.locator(`#product-list [data-add-to-cart="${robot.slug}"]`).click();
-  await frame.locator(`#product-list [data-add-to-cart="${extraRobot.slug}"]`).click();
+  await frame.locator(`#product-list [data-add-to-cart="${extraCar.slug}"]`).click();
   await frame.locator('#view-accessories').click();
   await frame.locator(`#product-list [data-add-to-cart="${accessory.slug}"]`).click();
   await expect(frame.locator('#cart-count')).toHaveText('3');
@@ -78,7 +78,7 @@ test('single-file cart persists between iframe pages through checkout, payment d
   await frame.locator(`[data-quantity-plus="${robot.slug}"]`).click();
   await expect(frame.locator(`[data-quantity="${robot.slug}"]`)).toHaveValue('2');
   await expect(frame.locator('#cart-count')).toHaveText('4');
-  await frame.locator(`[data-select-item="${extraRobot.slug}"]`).uncheck();
+  await frame.locator(`[data-select-item="${extraCar.slug}"]`).uncheck();
   const total = robot.priceCNY * 2 + accessory.priceCNY;
   await expect(frame.locator('#cart-total')).toHaveText(formatPrice(total));
   // Leaving and returning re-creates the iframe document; both state and selection must survive.
@@ -86,7 +86,7 @@ test('single-file cart persists between iframe pages through checkout, payment d
   await expect(frame.locator('main h1')).toBeVisible();
   await frame.locator('#header-cart').click();
   await expect(frame.locator(`[data-quantity="${robot.slug}"]`)).toHaveValue('2');
-  await expect(frame.locator(`[data-select-item="${extraRobot.slug}"]`)).not.toBeChecked();
+  await expect(frame.locator(`[data-select-item="${extraCar.slug}"]`)).not.toBeChecked();
   await frame.locator('#go-checkout').click();
   await expect(frame.locator('#checkout-form')).toBeVisible();
   await expect(frame.locator('[data-summary-item]:visible')).toHaveCount(2);
@@ -119,10 +119,10 @@ test('single-file cart persists between iframe pages through checkout, payment d
   expect(text).toContain('演示');
   await frame.locator('#header-cart').click();
   await expect(frame.locator('[data-cart-row]:visible')).toHaveCount(1);
-  await expect(frame.locator(`[data-cart-row="${extraRobot.slug}"]`)).toBeVisible();
+  await expect(frame.locator(`[data-cart-row="${extraCar.slug}"]`)).toBeVisible();
   await expect(frame.locator('#cart-count')).toHaveText('1');
-  const cart = await page.evaluate(key => JSON.parse((window as unknown as { __robotdogPreviewStorage: { getItem(key: string): string } }).__robotdogPreviewStorage.getItem(key)), CART);
-  expect(cart).toEqual([{ slug: extraRobot.slug, quantity: 1 }]);
+  const cart = await page.evaluate(key => JSON.parse((window as unknown as { __robotcarPreviewStorage: { getItem(key: string): string } }).__robotcarPreviewStorage.getItem(key)), CART);
+  expect(cart).toEqual([{ slug: extraCar.slug, quantity: 1 }]);
 });
 
 test('offline mobile navigation fits the viewport and malformed bridge storage recovers gracefully', async ({ page }) => {
@@ -131,11 +131,11 @@ test('offline mobile navigation fits the viewport and malformed bridge storage r
   await frame.getByRole('button', { name: '打开导航菜单' }).click();
   await expect(frame.getByRole('navigation', { name: '移动主导航' })).toBeVisible();
   await frame.getByRole('navigation', { name: '移动主导航' }).getByRole('link', { name: '产品系列' }).click();
-  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(robotProducts.length);
+  await expect(frame.locator('#product-list [data-product-card]:visible')).toHaveCount(carProducts.length);
   expect(await frame.locator('html').evaluate(element => element.scrollWidth)).toBeLessThanOrEqual(391);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(391);
   await page.evaluate(({ cart, selection }) => {
-    const storage = (window as unknown as { __robotdogPreviewStorage: { setItem(key: string, value: string): void } }).__robotdogPreviewStorage;
+    const storage = (window as unknown as { __robotcarPreviewStorage: { setItem(key: string, value: string): void } }).__robotcarPreviewStorage;
     storage.setItem(cart, '{broken json');
     storage.setItem(selection, '["stale-product"]');
   }, { cart: CART, selection: SELECTION });

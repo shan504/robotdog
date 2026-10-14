@@ -1,0 +1,12 @@
+RobotCar 玩具机器人车网站预览
+
+1. 请先解压压缩包，不要直接在压缩包内打开。
+2. 用 Chrome、Edge 或其他桌面浏览器打开 RobotCar-preview.html。
+3. 页面、图片和交互已内嵌，可查看产品分类、详情、购物车与结算演示。
+4. 如果浏览器阻止本地 HTML，或文件查看器显示空白，请使用项目开发服务器：
+   安装 Node.js 24 LTS，在项目文件夹执行 npm ci，再执行 npm run dev -- --port 4321。
+   在同一台电脑浏览器访问 http://localhost:4321/。
+
+商品为概念套装展示，价格与参数为样例。订单保存在浏览器内，支付演示不会真实扣款。
+新域名尚未指定；robotcar.example 是预览占位地址。
+源码与后续更新：https://github.com/shan504/robotdog

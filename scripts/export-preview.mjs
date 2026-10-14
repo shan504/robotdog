@@ -9,7 +9,7 @@ const assets = [];
 const assetIds = new Map();
 const mime = { '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
 const json = value => JSON.stringify(value).replace(/</g, '\\u003c');
-const tokenFor = index => `@@RD_ASSET_${index}@@`;
+const tokenFor = index => `@@RC_ASSET_${index}@@`;
 
 function assetPath(url) {
   const file = path.resolve(dist, `.${url}`);
@@ -57,12 +57,12 @@ async function htmlFiles(dir) {
 }
 
 const bridge = `<script>
-window.__robotdogPreviewSearch=@@RD_SEARCH_JSON@@;
-window.__robotdogPreviewHash=@@RD_HASH_JSON@@;
-window.__robotdogPreviewStorage=parent.__robotdogPreviewStorage;
-window.__robotdogPreviewNavigate=function(href,replace){parent.postMessage({type:'robotdog-offline-navigation',href:href,replace:!!replace},'*');};
-document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;var href=a.getAttribute('href');if(href&&href.startsWith('#')){e.preventDefault();var id=href.slice(1);if(id)document.getElementById(decodeURIComponent(id))?.scrollIntoView({behavior:'smooth'});return;}if(href&&href.startsWith('/')&&!href.startsWith('//')){e.preventDefault();window.__robotdogPreviewNavigate(href);}});
-window.addEventListener('load',function(){parent.postMessage({type:'robotdog-offline-loaded'},'*');});
+window.__robotcarPreviewSearch=@@RC_SEARCH_JSON@@;
+window.__robotcarPreviewHash=@@RC_HASH_JSON@@;
+window.__robotcarPreviewStorage=parent.__robotcarPreviewStorage;
+window.__robotcarPreviewNavigate=function(href,replace){parent.postMessage({type:'robotcar-offline-navigation',href:href,replace:!!replace},'*');};
+document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;var href=a.getAttribute('href');if(href&&href.startsWith('#')){e.preventDefault();var id=href.slice(1);if(id)document.getElementById(decodeURIComponent(id))?.scrollIntoView({behavior:'smooth'});return;}if(href&&href.startsWith('/')&&!href.startsWith('//')){e.preventDefault();window.__robotcarPreviewNavigate(href);}});
+window.addEventListener('load',function(){parent.postMessage({type:'robotcar-offline-loaded'},'*');});
 </script>`;
 
 const pages = {};
@@ -82,26 +82,26 @@ for (const file of await htmlFiles(dist)) {
 }
 
 const outputHtml = `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RobotDog · 网站交互预览</title><style>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RobotCar · 网站交互预览</title><style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Arial,"Microsoft YaHei",sans-serif;background:#fff}body{display:flex;flex-direction:column}.preview-toolbar{height:40px;flex:0 0 40px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;color:#ced9ec;background:#101b2e;font-size:11px}.preview-toolbar strong{color:#6aa9ff;font-size:12px}.preview-toolbar button{background:transparent;color:#dce6f6;border:1px solid #435a7b;padding:4px 9px;cursor:pointer;font-size:10px}.preview-toolbar span{margin-left:14px}iframe{border:0;flex:1;width:100%;min-height:0;background:white}@media(max-width:600px){.preview-toolbar{padding:0 10px}.preview-toolbar span{display:none}}
-</style></head><body><div class="preview-toolbar" id="preview-toolbar"><div><strong>RobotDog</strong><span>完整网站预览 · 演示结算，不会扣款</span></div><button id="hide-toolbar">隐藏此栏</button></div><iframe title="RobotDog 网站预览" id="website" sandbox="allow-scripts allow-forms allow-downloads allow-same-origin"></iframe><script>
+</style></head><body><div class="preview-toolbar" id="preview-toolbar"><div><strong>RobotCar</strong><span>完整网站预览 · 演示结算，不会扣款</span></div><button id="hide-toolbar">隐藏此栏</button></div><iframe title="RobotCar 网站预览" id="website" sandbox="allow-scripts allow-forms allow-downloads allow-same-origin"></iframe><script>
 const pages=${json(pages)};
 const assets=${json(assets)};
 const memory={};
-let retainedStorage;try{retainedStorage=window.localStorage;retainedStorage.setItem('robotdog.preview.probe','1');retainedStorage.removeItem('robotdog.preview.probe');}catch{retainedStorage=undefined;}
-window.__robotdogPreviewStorage={getItem:key=>{try{return retainedStorage?retainedStorage.getItem(key):memory[key]??null;}catch{return memory[key]??null;}},setItem:(key,value)=>{memory[key]=value;try{retainedStorage?.setItem(key,value);}catch{}},removeItem:key=>{delete memory[key];try{retainedStorage?.removeItem(key);}catch{}}};
+let retainedStorage;try{retainedStorage=window.localStorage;retainedStorage.setItem('robotcar.preview.probe','1');retainedStorage.removeItem('robotcar.preview.probe');}catch{retainedStorage=undefined;}
+window.__robotcarPreviewStorage={getItem:key=>{try{return retainedStorage?retainedStorage.getItem(key):memory[key]??null;}catch{return memory[key]??null;}},setItem:(key,value)=>{memory[key]=value;try{retainedStorage?.setItem(key,value);}catch{}},removeItem:key=>{delete memory[key];try{retainedStorage?.removeItem(key);}catch{}}};
 const frame=document.getElementById('website');
 let currentAnchor='';
-function render(){let url;try{url=new URL(location.hash.slice(1)||'/','https://robotdogcxy.xyz');}catch{url=new URL('https://robotdogcxy.xyz/');}currentAnchor=decodeURIComponent(url.hash.slice(1));const route=url.pathname.endsWith('/')||url.pathname.endsWith('.html')?url.pathname:url.pathname+'/';let content=pages[route]||pages['/404.html'];content=content.replace('@@RD_SEARCH_JSON@@',JSON.stringify(url.search)).replace('@@RD_HASH_JSON@@',JSON.stringify(url.hash));for(let pass=0;pass<3;pass++)content=content.replace(/@@RD_ASSET_(\\d+)@@/g,(_,i)=>assets[Number(i)]);frame.srcdoc=content;}
+function render(){let url;try{url=new URL(location.hash.slice(1)||'/','https://robotcar.example');}catch{url=new URL('https://robotcar.example/');}currentAnchor=decodeURIComponent(url.hash.slice(1));const route=url.pathname.endsWith('/')||url.pathname.endsWith('.html')?url.pathname:url.pathname+'/';let content=pages[route]||pages['/404.html'];content=content.replace('@@RC_SEARCH_JSON@@',JSON.stringify(url.search)).replace('@@RC_HASH_JSON@@',JSON.stringify(url.hash));for(let pass=0;pass<3;pass++)content=content.replace(/@@RC_ASSET_(\\d+)@@/g,(_,i)=>assets[Number(i)]);frame.srcdoc=content;}
 window.addEventListener('hashchange',render);
-window.addEventListener('message',e=>{if(e.source!==frame.contentWindow)return;if(e.data?.type==='robotdog-offline-navigation'){const href=e.data.href;if(typeof href==='string'&&href.startsWith('/')&&!href.startsWith('//')){if(e.data.replace){history.replaceState({},'','#'+href);render();}else if(location.hash.slice(1)===href)render();else location.hash=href;}}if(e.data?.type==='robotdog-offline-loaded'){try{document.title=frame.contentDocument.title+' · 离线预览';if(currentAnchor)frame.contentDocument.getElementById(currentAnchor)?.scrollIntoView();}catch{}}});
+window.addEventListener('message',e=>{if(e.source!==frame.contentWindow)return;if(e.data?.type==='robotcar-offline-navigation'){const href=e.data.href;if(typeof href==='string'&&href.startsWith('/')&&!href.startsWith('//')){if(e.data.replace){history.replaceState({},'','#'+href);render();}else if(location.hash.slice(1)===href)render();else location.hash=href;}}if(e.data?.type==='robotcar-offline-loaded'){try{document.title=frame.contentDocument.title+' · 离线预览';if(currentAnchor)frame.contentDocument.getElementById(currentAnchor)?.scrollIntoView();}catch{}}});
 document.getElementById('hide-toolbar').addEventListener('click',()=>document.getElementById('preview-toolbar').remove());render();
 </script></body></html>`;
 
 const outputDir = path.join(root, 'preview');
 await mkdir(outputDir, { recursive: true });
 await chmod(outputDir, 0o755);
-for (const output of [path.join(outputDir, 'RobotDog-preview.html'), path.join(root, 'RobotDog-preview.html')]) {
+for (const output of [path.join(outputDir, 'RobotCar-preview.html'), path.join(root, 'RobotCar-preview.html')]) {
   await writeFile(output, outputHtml, { mode: 0o644 });
   await chmod(output, 0o644);
 }

@@ -1,81 +1,70 @@
-# RobotDog 机器狗商城
+# RobotCar 玩具机器人车商城
 
-面向 `https://robotdogcxy.xyz` 的中文商城效果预览，使用 Astro 静态输出。白色产品目录、黑色技术详情与蓝色交互，支持手机浏览。
+RobotCar 是玩具机器人车、遥控竞速与编程教育套装的中文网站。保留原有白色目录、深色技术详情、蓝色交互与手机排版，产品图片与场景已全部换为车类素材。
 
-源码与后续更新统一保存在 [shan504/robotdog](https://github.com/shan504/robotdog)。[下载完整网站预览压缩包](https://github.com/shan504/robotdog/raw/refs/heads/main/RobotDog-v2-preview.zip)，解压后用桌面浏览器打开其中的 HTML。仓库中的 `src/` 和 `public/` 是可直接修改的网站源码与素材；压缩包用于查看效果。
+源码和更新继续保存在 [shan504/robotdog](https://github.com/shan504/robotdog)。仓库名称沿用既有地址，网站品牌为 RobotCar。
 
-已制作 26 款机器狗配置、8 款配件、34 个商品详情、6 个应用方案详情、9 篇探索与未来文章，以及关于、隐私、购物车、结算、支付演示与订单结果页面。同一机型的不同配置是独立 SKU，不代表 26 种不同外形。
+## 当前内容
 
-## 开发与构建
+- 9 个车类系列、26 款概念套装和 8 款配件，均有名称、展示价格、配置、参数与包装清单。
+- 6 个玩乐与教育场景、9 篇车类探索文章和关于我们。
+- 产品分类、搜索、详情跳转、购物车、数量与金额、结算、支付演示和结果下载。
+- 图片采用原创三维玩具车/配件渲染和生成式场景，不再包含原有机器狗及厂家产品图片。
 
-需要 Node.js 22.12+ 和 npm，本环境使用 Node.js 24.19.0。
+产品和套装为效果展示，价格与参数为样例，实际商品、规格、适龄标识、库存和报价需确认。当前订单只保存在访问者浏览器，支付不扣款，没有服务器订单数据库或商户收款接口。
 
-Windows 用户在 PowerShell 中运行：
+## 本地运行
 
-```powershell
-cd "$env:USERPROFILE\robotdog"
-git pull --ff-only
-npm ci --cache "$env:LOCALAPPDATA\npm-cache"
-npm run dev -- --port 4321
-```
-
-启动后在浏览器打开 `http://localhost:4321/`。用户目录缓存可以避开旧 Node.js 安装目录的写入权限错误。`dev`、`build`、`preview` 通过 Node.js 设置环境变量，兼容 Windows PowerShell 与 Linux/macOS，不依赖 Unix shell 的变量赋值语法。
-
-Linux/macOS 或云环境中运行：
+使用 Node.js 24 LTS。在已克隆的项目目录运行：
 
 ```bash
-cd /workspace/robotdog
 npm ci
 npm run dev -- --port 4321
 ```
 
-生产输出和浏览器验证：
+在你自己的电脑浏览器打开 `http://localhost:4321/`。
+
+Windows PowerShell 如出现 npm 缓存权限错误，使用用户目录缓存：
+
+```powershell
+npm ci --cache "$env:LOCALAPPDATA\npm-cache"
+npm run dev -- --port 4321
+```
+
+## 完整离线预览
+
+[下载完整网站预览](https://github.com/shan504/robotdog/raw/refs/heads/main/RobotCar-preview.zip)，解压后用桌面浏览器打开 `RobotCar-preview.html`。这是内嵌页面、图片、样式和购物交互脚本的完整 HTML，文件较大。也可用开发服务器查看。
+
+重新生成预览：
 
 ```bash
 npm run build
 npm run export:preview
-npm run preview -- --port 4322
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:4322 npm test
 ```
 
-测试使用系统 `/usr/bin/chromium`，可用 `CHROMIUM_PATH` 指定本机浏览器。`dist/` 是完整静态站点，可部署至阿里云 Nginx 或静态托管服务。构建不要并发执行，以免不同进程覆盖同一输出目录。
+输出根目录和 `preview/` 下的 `RobotCar-preview.html`。源文件 `src/` 和图片 `public/` 是后续修改入口。
 
-## 完整 HTML 预览
+## 新域名与 SEO
+
+新域名尚未指定。默认 `https://robotcar.example` 是保留的预览占位地址；未配置正式域名时页面为 noindex，robots 禁止抓取。
+
+复制 `.env.example` 为 `.env`，将 `PUBLIC_SITE_URL` 改成实际购买的 HTTPS 域名，然后重新构建：
 
 ```bash
-npm run build
+npm run package:deploy
 npm run export:preview
 ```
 
-导出 `RobotDog-preview.html` 与 `preview/RobotDog-preview.html`，内嵌页面、图片、样式和交互脚本。下载后可尝试用桌面浏览器打开，不需要联网或安装开发工具。聊天附件面板的 HTML 渲染能力与浏览器打开文件不同；本环境已测试完整 HTML 在断网浏览器文档中的显示与导航。受当前浏览器策略限制，未测试直接 `file://` 打开。
+Windows 可用 `Copy-Item .env.example .env`，Linux/macOS 可用 `cp .env.example .env`。`.env` 不提交；`PUBLIC_SITE_URL` 也可通过构建环境设置。
 
-后续更新先修改源码，再构建和导出；发布预览时同步更新 `RobotDog-v2.html` 与 `RobotDog-v2-preview.zip`，然后提交到本仓库的 `main` 分支。
+此配置统一控制 canonical、分享图片、结构化数据、robots、sitemap 和 Astro 站点 origin。新域名配置后公开内容允许索引，购物交易页持续 noindex。
 
-## 内容修改
+## Ubuntu 部署
 
-| 内容 | 文件 |
-| --- | --- |
-| 商品、价格、参数、配件关系 | `src/data/catalog.ts` |
-| 应用场景与推荐机型 | `src/data/solutions.ts` |
-| 探索与未来文章 | `src/data/articles.ts` |
-| 首页与关于我们 | `src/pages/index.astro`、`src/pages/about/index.astro` |
-| 导航、询价、SEO | `src/layouts/Layout.astro` |
-| 购物车与演示订单存储 | `src/lib/cart.ts` |
-| 全站配色与响应式样式 | `src/styles/global.css` |
-| 图片来源与模型许可 | `docs/image-sources.md`、`docs/image-sources.json` |
+`npm run package:deploy` 输出 `deploy/robotcar-site.tar.gz`、校验文件和构建信息。新安装使用 `/var/www/robotcar/current`，脚本检查部署包域名与指定域名一致；当前占位域名包用于预览，需用真实新域名重新构建后部署。
 
-机器狗图片来自真实厂商开源 3D 模型的渲染，非商品实拍；场景和配件图为生成的展示素材。机器狗品牌归相应权利人所有，本站没有声称官方经销授权。价格、配置、组合与参数为展示样例，发布销售前需确认真实商品资料和素材适用权限。
+详细命令见 [deploy/ALIYUN.md](deploy/ALIYUN.md)。仓库推送不等同于已经更新用户的服务器。
 
-## 购物与支付
+## 验证与素材
 
-商品卡片可加入购物车，订单页支持勾选、数量调整、移除与金额计算。结算页填写演示联系资料，进入微信或支付宝样式的支付演示，再生成演示结果和下载单据。
-
-没有商户支付接口、有效付款码或真实扣款。购物车、结算草稿和演示订单保存在当前浏览器 localStorage；存储不可用时使用临时内存。隐私页面说明用途并提供清除按钮。询价单在浏览器生成下载，不会向服务器发送。
-
-真实支付必须增加服务端订单、价格校验、商户签名及支付回调，不能仅把商户密钥写入前端。正式部署时还需补充真实销售主体、联系方式与售后资料。
-
-## SEO 与部署
-
-所有公开页面在构建时生成 HTML，包含独立标题、描述、canonical、图片说明和站内链接。站点地图自动收录全部商品、应用方案及文章；购物车、结算、支付页面设置 noindex 并从 sitemap 排除。商品价格为演示内容，因此没有发布可误认为真实报价的 Offer 结构化数据。
-
-部署目标为用户提供的 `robotdogcxy.xyz` 和阿里云 Ubuntu 22.04 服务器（公网 IP `47.85.33.165`）。运行 `npm run package:deploy` 生成生产网站包，服务器执行 `deploy/ubuntu-deploy.sh` 安装到 Nginx；具体命令与 HTTPS 步骤见 [deploy/ALIYUN.md](deploy/ALIYUN.md)。服务器无需 Node.js。仓库构建成功不代表服务器已部署，公开访问需按文档在实际服务器验证；实际收款需要后端与真实商户渠道。
+浏览器回归：`npm test`。记录见 [docs/VERIFICATION.md](docs/VERIFICATION.md)。素材说明见 [docs/image-sources.md](docs/image-sources.md)，三维模型场景源文件位于 `design/toy-car-studio.html`。
