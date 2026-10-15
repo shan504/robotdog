@@ -8,5 +8,5 @@ RobotCar 玩具机器人车网站预览
    在同一台电脑浏览器访问 http://localhost:4321/。
 
 商品为概念套装展示，价格与参数为样例。订单保存在浏览器内，支付演示不会真实扣款。
-新域名尚未指定；robotcar.example 是预览占位地址。
+正式域名：https://robotcar.icu/。公网访问需要先在 Ubuntu 服务器完成部署和证书安装。
 源码与后续更新：https://github.com/shan504/robotdog

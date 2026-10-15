@@ -4,7 +4,7 @@ import { products, carProducts, accessoryProducts, families, formatPrice } from 
 import { solutions } from '../src/data/solutions';
 import { articles } from '../src/data/articles';
 
-const siteOrigin = process.env.PUBLIC_SITE_URL || 'https://robotcar.example';
+const siteOrigin = process.env.PUBLIC_SITE_URL || 'https://robotcar.icu';
 const CART = 'robotcar.cart.v2';
 const SELECTION = 'robotcar.selection.v2';
 const ORDER = 'robotcar.order.v2';
@@ -404,7 +404,9 @@ test('all public pages have distinct SEO metadata, correct sitemap coverage, wor
     descriptions.add(description);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${siteOrigin}${path}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', process.env.PUBLIC_SITE_URL ? 'index, follow' : 'noindex, nofollow');
+    const hostname = new URL(siteOrigin).hostname;
+    const configured = !hostname.endsWith('.example') && hostname !== 'localhost' && hostname !== '127.0.0.1';
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', configured ? 'index, follow' : 'noindex, nofollow');
     const content = await page.evaluate(() => ({
       links: [...document.querySelectorAll<HTMLAnchorElement>('a[href]')].map(link => link.href),
       images: [...document.querySelectorAll<HTMLImageElement>('img[src]')].map(image => ({ src: image.src, alt: image.getAttribute('alt') })),

@@ -1,6 +1,7 @@
 import { readFile, writeFile, readdir, mkdir, chmod } from 'node:fs/promises';
 import path from 'node:path';
 import { build } from 'esbuild';
+import { defaultSiteUrl } from '../site.config.mjs';
 
 // Export the production site, including its compiled cart scripts, into one file.
 const root = path.resolve(import.meta.dirname, '..');
@@ -92,7 +93,7 @@ let retainedStorage;try{retainedStorage=window.localStorage;retainedStorage.setI
 window.__robotcarPreviewStorage={getItem:key=>{try{return retainedStorage?retainedStorage.getItem(key):memory[key]??null;}catch{return memory[key]??null;}},setItem:(key,value)=>{memory[key]=value;try{retainedStorage?.setItem(key,value);}catch{}},removeItem:key=>{delete memory[key];try{retainedStorage?.removeItem(key);}catch{}}};
 const frame=document.getElementById('website');
 let currentAnchor='';
-function render(){let url;try{url=new URL(location.hash.slice(1)||'/','https://robotcar.example');}catch{url=new URL('https://robotcar.example/');}currentAnchor=decodeURIComponent(url.hash.slice(1));const route=url.pathname.endsWith('/')||url.pathname.endsWith('.html')?url.pathname:url.pathname+'/';let content=pages[route]||pages['/404.html'];content=content.replace('@@RC_SEARCH_JSON@@',JSON.stringify(url.search)).replace('@@RC_HASH_JSON@@',JSON.stringify(url.hash));for(let pass=0;pass<3;pass++)content=content.replace(/@@RC_ASSET_(\\d+)@@/g,(_,i)=>assets[Number(i)]);frame.srcdoc=content;}
+function render(){let url;try{url=new URL(location.hash.slice(1)||'/',${json(defaultSiteUrl)});}catch{url=new URL(${json(defaultSiteUrl)});}currentAnchor=decodeURIComponent(url.hash.slice(1));const route=url.pathname.endsWith('/')||url.pathname.endsWith('.html')?url.pathname:url.pathname+'/';let content=pages[route]||pages['/404.html'];content=content.replace('@@RC_SEARCH_JSON@@',JSON.stringify(url.search)).replace('@@RC_HASH_JSON@@',JSON.stringify(url.hash));for(let pass=0;pass<3;pass++)content=content.replace(/@@RC_ASSET_(\\d+)@@/g,(_,i)=>assets[Number(i)]);frame.srcdoc=content;}
 window.addEventListener('hashchange',render);
 window.addEventListener('message',e=>{if(e.source!==frame.contentWindow)return;if(e.data?.type==='robotcar-offline-navigation'){const href=e.data.href;if(typeof href==='string'&&href.startsWith('/')&&!href.startsWith('//')){if(e.data.replace){history.replaceState({},'','#'+href);render();}else if(location.hash.slice(1)===href)render();else location.hash=href;}}if(e.data?.type==='robotcar-offline-loaded'){try{document.title=frame.contentDocument.title+' · 离线预览';if(currentAnchor)frame.contentDocument.getElementById(currentAnchor)?.scrollIntoView();}catch{}}});
 document.getElementById('hide-toolbar').addEventListener('click',()=>document.getElementById('preview-toolbar').remove());render();

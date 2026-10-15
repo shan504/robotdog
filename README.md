@@ -44,11 +44,11 @@ npm run export:preview
 
 输出根目录和 `preview/` 下的 `RobotCar-preview.html`。源文件 `src/` 和图片 `public/` 是后续修改入口。
 
-## 新域名与 SEO
+## 正式域名与 SEO
 
-新域名尚未指定。默认 `https://robotcar.example` 是保留的预览占位地址；未配置正式域名时页面为 noindex，robots 禁止抓取。
+正式域名为 `https://robotcar.icu`。HTTP 和 `www` 地址在服务器完成 HTTPS 配置后统一跳转到此地址，保留原页面路径与查询参数。
 
-复制 `.env.example` 为 `.env`，将 `PUBLIC_SITE_URL` 改成实际购买的 HTTPS 域名，然后重新构建：
+默认构建即可生成此正式域名的站点。需要覆盖部署域名时，复制 `.env.example` 为 `.env`，修改 `PUBLIC_SITE_URL` 后重新构建：
 
 ```bash
 npm run package:deploy
@@ -57,11 +57,11 @@ npm run export:preview
 
 Windows 可用 `Copy-Item .env.example .env`，Linux/macOS 可用 `cp .env.example .env`。`.env` 不提交；`PUBLIC_SITE_URL` 也可通过构建环境设置。
 
-此配置统一控制 canonical、分享图片、结构化数据、robots、sitemap 和 Astro 站点 origin。新域名配置后公开内容允许索引，购物交易页持续 noindex。
+此配置统一控制 canonical、分享图片、结构化数据、robots、sitemap 和 Astro 站点 origin。公开内容允许索引，购物交易页持续 noindex。显式使用 `.example` 或本机地址构建时，页面 noindex、robots 禁止抓取。
 
 ## Ubuntu 部署
 
-`npm run package:deploy` 输出 `deploy/robotcar-site.tar.gz`、校验文件和构建信息。新安装使用 `/var/www/robotcar/current`，脚本检查部署包域名与指定域名一致；当前占位域名包用于预览，需用真实新域名重新构建后部署。
+`npm run package:deploy` 输出 `deploy/robotcar-site.tar.gz`、校验文件和构建信息。新安装使用 `/var/www/robotcar/current`，脚本检查部署包域名与指定域名一致。先运行 `ubuntu-deploy.sh robotcar.icu` 安装站点，再运行 `enable-https.sh robotcar.icu` 申请双域名证书并启用 HTTPS。
 
 详细命令见 [deploy/ALIYUN.md](deploy/ALIYUN.md)。仓库推送不等同于已经更新用户的服务器。
 

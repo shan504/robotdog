@@ -13,7 +13,7 @@ ENABLED="/etc/nginx/sites-enabled/robotcar"
 MARKER="# RobotCar managed site: $DOMAIN"
 
 if [[ "$EUID" -ne 0 ]]; then
-  echo "请运行：sudo bash robotcar-deploy.sh" >&2
+  echo "请运行：sudo bash robotcar-deploy.sh $DOMAIN" >&2
   exit 1
 fi
 for command in curl nginx tar sha256sum cmp systemctl; do
@@ -98,7 +98,7 @@ if [[ -e "$ENABLED" || -L "$ENABLED" ]] && [[ "$(readlink -f "$ENABLED")" != "$C
   echo "$ENABLED 已指向其他配置，未覆盖。" >&2
   exit 1
 fi
-domain_pattern="${DOMAIN//./\\.}"
+domain_pattern="(www\\.)?${DOMAIN//./\\.}"
 conflicts="$(grep -RlE "server_name[^;]*[[:space:]]$domain_pattern([[:space:];]|$)" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null | grep -vFx "$ENABLED" || true)"
 if [[ -n "$conflicts" ]]; then
   echo "此域名已有其他 Nginx 站点配置，未替换：$conflicts" >&2

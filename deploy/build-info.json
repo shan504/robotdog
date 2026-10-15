@@ -1,8 +1,8 @@
 {
-  "site": "https://robotcar.example",
-  "productionDomainConfigured": false,
+  "site": "https://robotcar.icu",
+  "productionDomainConfigured": true,
   "htmlPages": 60,
-  "bytes": 1435844,
-  "sha256": "20efd49015ad35099b9998acd9f560ef578e1309da552261dc9c3411442ebb0e",
-  "generatedAt": "2026-10-14T12:57:12.256Z"
+  "bytes": 1435602,
+  "sha256": "7589eefeb8e22f429df917eb5c05f65f88b0d4e95027ea83ee93ed667ae0cc4f",
+  "generatedAt": "2026-10-15T01:49:21.747Z"
 }
